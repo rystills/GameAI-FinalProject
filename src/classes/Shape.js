@@ -30,6 +30,6 @@ function Shape(type, color, cx, cy) {
 	this.dir = 0;
 	
 	//cap the speed from going too high
-	this.speed = Math.min(15 + 100*(totalTime/1000), 10);
+	this.speed = Math.min(15 + 100*(totalTime/1000), 45);
 	this.width = this.height = shapeDim;
 }

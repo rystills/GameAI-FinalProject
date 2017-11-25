@@ -122,7 +122,7 @@ function populateShapeImages() {
 			//add all of the points for this shape
 			let centerX = centerY = shapeDim/2;
 			let slice = 2 * Math.PI / curPoints;
-			let radius = shapeDim/2-lineThickness;
+			let radius = shapeDim/2-(lineThickness*2);
 			for (let k = 0; k < curPoints; ++k) {
 				let angle = -Math.PI / (curPoints == 3 ? 2 : 4) + slice * k;
 				let newX = (centerX + radius * Math.cos(angle));

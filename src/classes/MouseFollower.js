@@ -1,8 +1,14 @@
+/**
+ * switch to the next shape color in order
+ */
 MouseFollower.prototype.changeColor = function() {
 	this.color = (this.color == shapeColors.red ? shapeColors.green : (this.color == shapeColors.green ? shapeColors.blue : shapeColors.red));
 	this.imgName = shapeTypes[this.type] + shapeColors[this.color];
 }
 
+/**
+ * switch to the next shape type in order
+ */
 MouseFollower.prototype.changeType = function() {
 	this.type = (this.type == shapeTypes.triangle ? shapeTypes.square : (this.type == shapeTypes.square ? shapeTypes.circle : shapeTypes.triangle));
 	this.imgName = shapeTypes[this.type] + shapeColors[this.color];
