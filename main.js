@@ -59,32 +59,49 @@ function updateShapeTimer() {
  * main game loop; update all aspects of the game in-order
  */
 function update() {
-	//update the deltaTime
-	updateTime();
+	if (gameActive) {
+		//update the deltaTime
+		updateTime();
+		
+		//update shape spawn timer
+		updateShapeTimer();
+		
+		//update objects
+		for (let i = 0; i < objects.length; objects[i].update(), ++i);
+		
+		//update GUI elements
+		for (let i = 0; i < buttons.length; buttons[i].update(), ++i);
+		
+		//once all updates are out of the way, render the frame
+		render();
+		
+		//toggle off any one-frame event indicators at the end of the update tick
+		mousePressedLeft = false;
+		mousePressedRight = false;
+	}
 	
-	//update shape spawn timer
-	updateShapeTimer();
-	
-	//update objects
-	for (let i = 0; i < objects.length; objects[i].update(), ++i);
-	
-	//update GUI elements
-	for (let i = 0; i < buttons.length; buttons[i].update(), ++i);
-	
-	//once all updates are out of the way, render the frame
-	render();
-	
-	//toggle off any one-frame event indicators at the end of the update tick
-	mousePressedLeft = false;
-	mousePressedRight = false;
+	//draw game-over text
+	else {
+		clearScreen();
+		ctx.font = "64px Arial";
+		ctx.fillStyle = "#FF0000";
+		scoreString = "GAME OVER! FINAL SCORE: " + score;
+		textWidth = ctx.measureText(scoreString).width;
+		ctx.fillText(scoreString,cnv.width/2 - textWidth/2, cnv.height/2 + 24);
+	}
 }
 
+/**
+ * end the game
+ */
+function endGame() {
+	gameActive = false;
+}
 
 /**
  * add an entry to the image dict for each shape/color combination
  */
 function populateShapeImages() {
-	let shapeDim = 64;
 	let lineThickness = 1;
 	
 	for (let i = 0; i < shapeTypes.length; ++i) {
@@ -142,7 +159,7 @@ function loadAssets() {
 	//setup a global, ordered list of asset files to load
 	requiredFiles = [
 		"src\\util.js","src\\setupKeyListeners.js", //misc functions
-		"src\\classes\\Enum.js", "src\\classes\\Button.js", "src\\classes\\Shape.js" //classes
+		"src\\classes\\Enum.js", "src\\classes\\Button.js", "src\\classes\\Shape.js", "src\\classes\\MouseFollower.js" //classes
 		];
 	
 	//manually load the asset loader
@@ -176,8 +193,14 @@ function initGlobals() {
 	score = 0;
 	shapesSpawned = 0;
 	timeToNextShape = 0;
+	shapeDim = 64;
 	
 	populateShapeImages();
+	
+	//create the mouse follower
+	objects.push(new MouseFollower());
+	
+	gameActive = true;
 }
 
 //disallow right-click context menu as right click functionality is necessary for block removal

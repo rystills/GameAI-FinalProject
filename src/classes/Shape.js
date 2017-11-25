@@ -3,8 +3,14 @@ shapeColors = new Enum("blue","green", "red");
 colorValues = {"blue":"#0000FF","green":"#00FF00","red":"#FF0000"};
 shapePointNumbers = {"square":4,"triangle":3,"circle":69};
 	
+/**
+ * move the shape towards the left edge of the screen, ending the game if it reaches the edge
+ */
 Shape.prototype.update = function() {
 	this.x -= 10*deltaTime * this.speed;
+	if (this.x <= 0) {
+		endGame();
+	}
 }
 
 /**
@@ -25,4 +31,5 @@ function Shape(type, color, cx, cy) {
 	
 	//cap the speed from going too high
 	this.speed = Math.min(15 + 100*(totalTime/1000), 10);
+	this.width = this.height = shapeDim;
 }
