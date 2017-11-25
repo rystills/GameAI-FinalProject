@@ -20,6 +20,6 @@ function Shape(type, color, cx, cy) {
 	this.x = cx;
 	this.y = cy;
 	
-	this.imgName = images[shapeTypes[this.type] + shapeColors[this.color]];
+	this.imgName = shapeTypes[this.type] + shapeColors[this.color];
 	this.dir = 0;
 }

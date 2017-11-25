@@ -45,7 +45,7 @@ function updateShapeTimer() {
 		let type = shapeTypes[getRandomInt(0,shapeTypes.length)];
 		let color = shapeColors[getRandomInt(0,shapeColors.length)];
 		let y = getRandomInt(0,cnv.height);
-		objects.push(new Shape(type,color,cnv.width,y));
+		objects.push(new Shape(type,color,cnv.width/2,y/2));
 		
 		timeToNextShape += 10 * (1/shapesSpawned);
 		++shapesSpawned;
@@ -63,10 +63,10 @@ function update() {
 	updateShapeTimer();
 	
 	//update objects
-	for (let i = 0; i < objects.length; objects[i].update, ++i);
+	for (let i = 0; i < objects.length; objects[i].update(), ++i);
 	
 	//update GUI elements
-	for (let i = 0; i < buttons.length; buttons[i].update, ++i);
+	for (let i = 0; i < buttons.length; buttons[i].update(), ++i);
 	
 	//once all updates are out of the way, render the frame
 	render();
@@ -79,15 +79,16 @@ function update() {
 
 /**
  * add an entry to the image dict for each shape/color combination
- * @returns
  */
 function populateShapeImages() {
 	let shapeDim = 32;
+	let lineThickness = 1;
+	
 	for (let i = 0; i < shapeTypes.length; ++i) {
 		let curShape = shapeTypes[i];
-		let curPoints = shapePointNumbers[i];
+		let curPoints = shapePointNumbers[curShape];
 		for (let r = 0; r < shapeColors.length; ++r) {
-			let curColor = colorValues[r];
+			let curColor = colorValues[shapeColors[r]];
 			
 			//prepare a new canvas for this shape
 			let shapeCnv = document.createElement("canvas");
@@ -95,19 +96,21 @@ function populateShapeImages() {
 			shapeCnv.height = shapeDim;
 			let shapeCtx = shapeCnv.getContext("2d");
 			shapeCtx.strokeStyle = "#000000";
-			shapeCtx.lineWidth = 5;
+			shapeCtx.lineWidth = 1;
 			shapeCtx.beginPath();
 			
 			//add all of the points for this shape
-			let centerX = centerY = 16;
-			let slice = 2 * Math.pi / curPoints;
-			let radius = 16;
+			let centerX = centerY = shapeDim/2;
+			let slice = 2 * Math.PI / curPoints;
+			let radius = shapeDim/2-lineThickness;
 			for (let k = 0; k < curPoints; ++k) {
-				let angle = slice * k;
+				let angle = -Math.PI / (curPoints == 3 ? 2 : 4) + slice * k;
 				let newX = (centerX + radius * Math.cos(angle));
 				let newY = (centerY + radius * Math.sin(angle));
 				shapeCtx.lineTo(newX,newY);
 			}
+			
+			//finalize the shape and add it to the images dict
 			shapeCtx.closePath();
 			shapeCtx.fillStyle = curColor;
 			shapeCtx.fill();
