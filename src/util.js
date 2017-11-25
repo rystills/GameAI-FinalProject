@@ -125,7 +125,7 @@ function getRandomInt(min, max) {
  * @param rot: if specified, the amount in degrees by which to rotate the image
  */
 function drawCentered(imageName,ctx,x,y,rot) {
-	var img = images[imageName];
+	let img = images[imageName];
 	ctx.save();
 	//perform the inverse of the object's translation to effectively bring it to the origin
 	ctx.translate(x,y);
@@ -181,7 +181,7 @@ function pointInRect(px,py,obj, objectPosIsTopLeft) {
  * update the global deltaTime
  */
 function updateTime() {
-	var curTime = Date.now();
+	let curTime = Date.now();
 	//divide by 1,000 to get deltaTime in seconds
     deltaTime = (curTime - prevTime) / 1000;
     //cap deltaTime at ~15 ticks/sec as below this threshhold collisions may not be properly detected

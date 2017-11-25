@@ -2,24 +2,54 @@
  * clear each canvas to a predetermined fillcolor, preparing it for a fresh render
  */
 function clearScreen() {
-	ctx.fillStyle="rgb(22,19,58)";
+	//main canvas
+	ctx.fillStyle="#add8e6";
 	ctx.fillRect(0,0,cnv.width,cnv.height);
+	
+	//HUD canvas
+	uictx.fillStyle="rgb(0,0,0)";
+	uictx.fillRect(0,0,uicnv.width,uicnv.height);
 }
 
+/**
+ * render all objects and HUD elements
+ */
 function render() {
 	//clear all canvases for a fresh render
 	clearScreen();
 	
-	//draw the map tiles first
-	drawMap();
-	
 	//draw objects centered in order
-	for (var i = 0; i < objects.length; ++i) {
-		drawCentered(objects[i].image,objects[i].canvas.getContext("2d"), objects[i].x, objects[i].y,objects[i].dir);
+	for (let i = 0; i < objects.length; ++i) {
+		drawCentered(objects[i].imgName,ctx, objects[i].x, objects[i].y,objects[i].dir);
 	}
 	
 	//finally draw the HUD
 	drawHUD();
+}
+
+/**
+ * draw the HUD
+ */
+function drawHUD() {
+	uictx.font = "24px Arial";
+	uictx.fillStyle = "#FFFFFF";
+	uictx.fillText("Score: " + score, 10,30);
+}
+
+/**
+ * reduce the shape timer by deltaTime, creating a new shape and resetting the timer if it hits 0
+ */
+function updateShapeTimer() {
+	timeToNextShape -= deltaTime;
+	while (timeToNextShape <= 0) {
+		let type = shapeTypes[getRandomInt(0,shapeTypes.length)];
+		let color = shapeColors[getRandomInt(0,shapeColors.length)];
+		let y = getRandomInt(0,cnv.height);
+		objects.push(new Shape(type,color,cnv.width,y));
+		
+		timeToNextShape += 10 * (1/shapesSpawned);
+		++shapesSpawned;
+	}
 }
 
 /**
@@ -29,11 +59,14 @@ function update() {
 	//update the deltaTime
 	updateTime();
 	
+	//update shape spawn timer
+	updateShapeTimer();
+	
 	//update objects
-	for (var i = 0; i < objects.length; objects[i].update, ++i);
+	for (let i = 0; i < objects.length; objects[i].update, ++i);
 	
 	//update GUI elements
-	for (var i = 0; i < buttons.length; buttons[i].update, ++i);
+	for (let i = 0; i < buttons.length; buttons[i].update, ++i);
 	
 	//once all updates are out of the way, render the frame
 	render();
@@ -41,6 +74,47 @@ function update() {
 	//toggle off any one-frame event indicators at the end of the update tick
 	mousePressedLeft = false;
 	mousePressedRight = false;
+}
+
+
+/**
+ * add an entry to the image dict for each shape/color combination
+ * @returns
+ */
+function populateShapeImages() {
+	let shapeDim = 32;
+	for (let i = 0; i < shapeTypes.length; ++i) {
+		let curShape = shapeTypes[i];
+		let curPoints = shapePointNumbers[i];
+		for (let r = 0; r < shapeColors.length; ++r) {
+			let curColor = colorValues[r];
+			
+			//prepare a new canvas for this shape
+			let shapeCnv = document.createElement("canvas");
+			shapeCnv.width = shapeDim;
+			shapeCnv.height = shapeDim;
+			let shapeCtx = shapeCnv.getContext("2d");
+			shapeCtx.strokeStyle = "#000000";
+			shapeCtx.lineWidth = 5;
+			shapeCtx.beginPath();
+			
+			//add all of the points for this shape
+			let centerX = centerY = 16;
+			let slice = 2 * Math.pi / curPoints;
+			let radius = 16;
+			for (let k = 0; k < curPoints; ++k) {
+				let angle = slice * k;
+				let newX = (centerX + radius * Math.cos(angle));
+				let newY = (centerY + radius * Math.sin(angle));
+				shapeCtx.lineTo(newX,newY);
+			}
+			shapeCtx.closePath();
+			shapeCtx.fillStyle = curColor;
+			shapeCtx.fill();
+			shapeCtx.stroke();
+			images[shapeTypes[i] + shapeColors[r]] = shapeCnv;
+		}
+	}
 }
 
 /**
@@ -62,15 +136,11 @@ function loadAssets() {
 	//setup a global, ordered list of asset files to load
 	requiredFiles = [
 		"src\\util.js","src\\setupKeyListeners.js", //misc functions
-		"ext\\enums\\enums.js", //external dependencies
-		"images\\bluecircle.png", "images\\bluesquare.png", "images\\bluetriangle.png", //blue shape images
-		"images\\greencircle.png", "images\\greensquare.png", "images\\greentriangle.png", //green shape images 
-		"images\\redcircle.png", "images\\redsquare.png", "images\\redtriangle.png", //red shape images
-		"src\\classes\\Button.js" //classes
+		"src\\classes\\Enum.js", "src\\classes\\Button.js", "src\\classes\\Shape.js" //classes
 		];
 	
 	//manually load the asset loader
-	var script = document.createElement('script');
+	let script = document.createElement('script');
 	script.type = 'text/javascript';
 	script.src = "src\\loadAssets.js";
 	script.onload = loadAssets;
@@ -90,15 +160,18 @@ function initGlobals() {
 	deltaTime = 0;
 	totalTime = 0;
 	
-	//global enums
-	shapes = new enums.Enum("square","circle", "triangle");
-	colors = new enums.Enum("blue","green", "red");
-	
 	//global game objects
 	objects = [];
 	
 	//global list of UI buttons
 	buttons = [];
+	
+	//global counters
+	score = 0;
+	shapesSpawned = 0;
+	timeToNextShape = 0;
+	
+	populateShapeImages();
 }
 
 //disallow right-click context menu as right click functionality is necessary for block removal

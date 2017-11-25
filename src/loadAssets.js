@@ -21,7 +21,7 @@ function loadAssets() {
  * @returns
  */
 function parsePath(path) {
-	var stripped = path.split("\\");
+	let stripped = path.split("\\");
 	return stripped[stripped.length-1].split('.')[0];
 }
 
@@ -40,12 +40,12 @@ function loadAsset() {
 	}
 	
 	//get the element type from its file extension
-	var splitName = requiredFiles[assetNum].split(".");
-	var extension = splitName[splitName.length-1];
-	var elemType = (extension == "js" ? "script" : "IMG")
+	let splitName = requiredFiles[assetNum].split(".");
+	let extension = splitName[splitName.length-1];
+	let elemType = (extension == "js" ? "script" : "IMG")
 	
 	//create the new element
-	var elem = document.createElement(elemType);
+	let elem = document.createElement(elemType);
 	elem.onload = loadAsset;
 	elem.src = requiredFiles[assetNum];
 	

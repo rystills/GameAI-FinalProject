@@ -55,7 +55,7 @@ function setupKeyListeners() {
  * @returns an object containing the x,y coordinates of the mouse
  */
 function getMouseDocument(evt,cnv) {
-	 var rect = cnv.getBoundingClientRect();
+	 let rect = cnv.getBoundingClientRect();
 	 return {x: evt.clientX - rect.left, y: evt.clientY - rect.top};	
 }
 
