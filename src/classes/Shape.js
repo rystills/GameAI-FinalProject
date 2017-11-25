@@ -4,7 +4,7 @@ colorValues = {"blue":"#0000FF","green":"#00FF00","red":"#FF0000"};
 shapePointNumbers = {"square":4,"triangle":3,"circle":69};
 	
 Shape.prototype.update = function() {
-	this.x -= 100*deltaTime;
+	this.x -= 10*deltaTime * this.speed;
 }
 
 /**
@@ -22,4 +22,7 @@ function Shape(type, color, cx, cy) {
 	
 	this.imgName = shapeTypes[this.type] + shapeColors[this.color];
 	this.dir = 0;
+	
+	//cap the speed from going too high
+	this.speed = Math.min(15 + 100*(totalTime/1000), 10);
 }

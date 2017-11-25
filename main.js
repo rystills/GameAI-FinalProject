@@ -42,13 +42,16 @@ function drawHUD() {
 function updateShapeTimer() {
 	timeToNextShape -= deltaTime;
 	while (timeToNextShape <= 0) {
+		//the timer has reached 0; time to spawn a new shape
 		let type = shapeTypes[getRandomInt(0,shapeTypes.length)];
 		let color = shapeColors[getRandomInt(0,shapeColors.length)];
 		let y = getRandomInt(0,cnv.height);
-		objects.push(new Shape(type,color,cnv.width/2,y/2));
-		
-		timeToNextShape += 10 * (1/shapesSpawned);
+		objects.push(new Shape(type,color,cnv.width,y));
 		++shapesSpawned;
+	
+		//make sure that we increase time by at least a small amount
+		let timeIncrease = Math.max(2 - (shapesSpawned*.01), .1);
+		timeToNextShape = timeIncrease;
 	}
 }
 
@@ -81,7 +84,7 @@ function update() {
  * add an entry to the image dict for each shape/color combination
  */
 function populateShapeImages() {
-	let shapeDim = 32;
+	let shapeDim = 64;
 	let lineThickness = 1;
 	
 	for (let i = 0; i < shapeTypes.length; ++i) {
