@@ -4,12 +4,20 @@ colorValues = {"blue":"#0000FF","green":"#00FF00","red":"#FF0000"};
 shapePointNumbers = {"square":4,"triangle":3,"circle":69};
 	
 /**
+ * this shape just reached the edge of the screen; remove the shape from the object list and subtract from the player's score
+ */
+Shape.prototype.reachedScreenEdge = function() {
+	score -= 3;
+	objects.splice(objects.indexOf(this),1);
+}
+
+/**
  * move the shape towards the left edge of the screen, ending the game if it reaches the edge
  */
 Shape.prototype.update = function() {
 	this.x -= 10*deltaTime * this.speed;
 	if (this.x <= 0) {
-		endGame();
+		this.reachedScreenEdge();
 	}
 }
 

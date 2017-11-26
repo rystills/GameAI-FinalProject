@@ -15,6 +15,16 @@ MouseFollower.prototype.changeType = function() {
 }
 
 /**
+ * evaluate a collision with the object corresponding to the specified index in objects, tweaking score depending on shape similarity
+ */
+MouseFollower.prototype.evaluateCollision = function(i) {
+	let sameType = objects[i].type == this.type;
+	let sameColor = objects[i].color == this.color;
+	objects.splice(i,1);
+	score += (-1 + 2*(sameType + sameColor));
+}
+
+/**
  * move the mouse follower to the mouse position, changing type or color on mouse click
  */
 MouseFollower.prototype.update = function() {
@@ -34,10 +44,9 @@ MouseFollower.prototype.update = function() {
 	for (let i = 0; i < objects.length; ++i) {
 		if (objects[i] instanceof Shape) {
 			if (collisionCheck(this,objects[i])) {
-				if (objects[i].type == this.type && objects[i].color == this.color) {
-					objects.splice(i,1);
-					++score;
-				}	
+				//a collision was found; modify score depending on the similarity between the shapes, then continue on
+				this.evaluateCollision(i);
+				--i;
 			}
 		}
 	}
