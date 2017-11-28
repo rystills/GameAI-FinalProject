@@ -12,7 +12,7 @@ function loadAssets() {
 	//quick and dirty way to store local text files as JS objects
 	object = null;
 	
-	loadAsset();
+	loadSingleAsset();
 }
 
 /**
@@ -28,7 +28,7 @@ function parsePath(path) {
 /**
  * load a single asset, setting onload to move on to the next asset
  */
-function loadAsset() {
+function loadSingleAsset() {
 	//if the global object var contains a string, append it to the global scripts list
 	if (object != null) {
 		scripts[parsePath(requiredFiles[assetNum-1])] = object;
@@ -46,7 +46,7 @@ function loadAsset() {
 	
 	//create the new element
 	let elem = document.createElement(elemType);
-	elem.onload = loadAsset;
+	elem.onload = loadSingleAsset;
 	elem.src = requiredFiles[assetNum];
 	
 	//add the new element to the body if its a script

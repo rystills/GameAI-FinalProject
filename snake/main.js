@@ -18,13 +18,38 @@ function render() {
 	//clear all canvases for a fresh render
 	clearScreen();
 	
-	//draw objects centered in order
+	drawGrid();
+	
+	//draw all objects with images specified, centered in order of list indices
 	for (let i = 0; i < objects.length; ++i) {
-		drawCentered(objects[i].imgName,ctx, objects[i].x, objects[i].y,objects[i].dir);
+		if (objects[i].imgName) {
+			drawCentered(objects[i].imgName,ctx, objects[i].x, objects[i].y,objects[i].dir);	
+		}
 	}
 	
 	//finally draw the HUD
 	drawHUD();
+}
+
+/**
+ * draw the base grid to the screen
+ */
+function drawGrid() {
+	//draw the playing field background
+	ctx.fillStyle = "#008800";
+	ctx.rect(0,0,gridSize*gridScale,gridSize*gridScale);
+	ctx.fill();
+	
+	//draw the gridlines
+	ctx.strokeStyle = "#000000";
+	ctx.beginPath();
+	for (let i = 0; i < gridSize+1; ++i) {
+		ctx.moveTo(i*gridScale,0);
+		ctx.lineTo(i*gridScale,gridScale*gridSize);
+		ctx.moveTo(0,i*gridScale);
+		ctx.lineTo(gridScale*gridSize, i*gridScale);
+	}
+	ctx.stroke();
 }
 
 /**
@@ -37,34 +62,12 @@ function drawHUD() {
 }
 
 /**
- * reduce the shape timer by deltaTime, creating a new shape and resetting the timer if it hits 0
- */
-function updateShapeTimer() {
-	timeToNextShape -= deltaTime;
-	while (timeToNextShape <= 0) {
-		//the timer has reached 0; time to spawn a new shape
-		let type = shapeTypes[getRandomInt(0,shapeTypes.length)];
-		let color = shapeColors[getRandomInt(0,shapeColors.length)];
-		let y = getRandomInt(0,cnv.height);
-		objects.push(new Shape(type,color,cnv.width,y));
-		++shapesSpawned;
-	
-		//make sure that we increase time by at least a small amount
-		let timeIncrease = Math.max(2 - (shapesSpawned*.01), .1);
-		timeToNextShape = timeIncrease;
-	}
-}
-
-/**
  * main game loop; update all aspects of the game in-order
  */
 function update() {
 	if (gameActive) {
 		//update the deltaTime
 		updateTime();
-		
-		//update shape spawn timer
-		updateShapeTimer();
 		
 		//update objects
 		for (let i = 0; i < objects.length; objects[i].update(), ++i);
@@ -99,46 +102,12 @@ function endGame() {
 }
 
 /**
- * add an entry to the image dict for each shape/color combination
+ * 
+ * @param o: the object whose x,y coordinates we wish to update from their gridX,gridY coordinates
  */
-function populateShapeImages() {
-	let lineThickness = 1;
-	
-	for (let i = 0; i < shapeTypes.length; ++i) {
-		let curShape = shapeTypes[i];
-		let curPoints = shapePointNumbers[curShape];
-		for (let r = 0; r < shapeColors.length; ++r) {
-			let curColor = colorValues[shapeColors[r]];
-			
-			//prepare a new canvas for this shape
-			let shapeCnv = document.createElement("canvas");
-			shapeCnv.width = shapeDim;
-			shapeCnv.height = shapeDim;
-			let shapeCtx = shapeCnv.getContext("2d");
-			shapeCtx.strokeStyle = "#000000";
-			shapeCtx.lineWidth = 1;
-			shapeCtx.beginPath();
-			
-			//add all of the points for this shape
-			let centerX = centerY = shapeDim/2;
-			let slice = 2 * Math.PI / curPoints;
-			//multiply line thickness by 2 as a small buffer so that the shape outline is not partially cut off by the canvas edge
-			let radius = shapeDim/2-(lineThickness*2);
-			for (let k = 0; k < curPoints; ++k) {
-				let angle = -Math.PI / (curPoints == 3 ? 2 : 4) + slice * k;
-				let newX = (centerX + radius * Math.cos(angle));
-				let newY = (centerY + radius * Math.sin(angle));
-				shapeCtx.lineTo(newX,newY);
-			}
-			
-			//finalize the shape and add it to the images dict
-			shapeCtx.closePath();
-			shapeCtx.fillStyle = curColor;
-			shapeCtx.fill();
-			shapeCtx.stroke();
-			images[shapeTypes[i] + shapeColors[r]] = shapeCnv;
-		}
-	}
+function calculatePositionFromGrid(o) {
+	o.x = o.gridX * gridScale;
+	o.y = o.gridY * gridScale;
 }
 
 /**
@@ -160,7 +129,7 @@ function loadAssets() {
 	//setup a global, ordered list of asset files to load
 	requiredFiles = [
 		"src\\util.js","src\\setupKeyListeners.js", //misc functions
-		"src\\classes\\Enum.js", "src\\classes\\Button.js", "src\\classes\\Shape.js", "src\\classes\\MouseFollower.js" //classes
+		"src\\classes\\Enum.js", "src\\classes\\Button.js", "src\\classes\\Snake.js" //classes
 		];
 	
 	//manually load the asset loader
@@ -184,6 +153,10 @@ function initGlobals() {
 	deltaTime = 0;
 	totalTime = 0;
 	
+	//global game constants
+	gridScale = 20;
+	gridSize = 30;
+	
 	//global game objects
 	objects = [];
 	
@@ -192,14 +165,9 @@ function initGlobals() {
 	
 	//global counters
 	score = 0;
-	shapesSpawned = 0;
-	timeToNextShape = 0;
-	shapeDim = 64;
-	
-	populateShapeImages();
-	
-	//create the mouse follower
-	objects.push(new MouseFollower());
+		
+	//create the player character
+	objects.push(new Snake(5,8));
 	
 	gameActive = true;
 }
