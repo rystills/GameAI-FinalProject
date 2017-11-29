@@ -22,6 +22,8 @@ function render() {
 	
 	drawPlayer();
 	
+	drawFood();
+	
 	drawGridlines();
 	
 	//draw all objects with images specified, centered in order of list indices
@@ -45,9 +47,23 @@ function drawPlayfieldBackground() {
 	ctx.fill();
 }
 
+/**
+ * draw the current location of the food on the grid
+ */
+function drawFood() {
+	ctx.fillStyle = "#FF0000";
+	ctx.beginPath();
+	ctx.rect(foodPos[0]*gridScale,foodPos[1]*gridScale,gridScale,gridScale);
+	ctx.closePath();
+	ctx.fill();
+}
+
+/**
+ * draw the player's body parts on the grid
+ */
 function drawPlayer() {
 	//draw the player
-	ctx.fillStyle = "#0000FF";
+	ctx.fillStyle = "#AAAAFF";
 	ctx.beginPath();
 	for (let i = 0; i < player.spaces.length; ++i) {
 		ctx.rect(player.spaces[i][0]*gridScale,player.spaces[i][1]*gridScale,gridScale,gridScale);
@@ -123,12 +139,41 @@ function endGame() {
 }
 
 /**
+ * place the food at a random location not currently occupied by the player
+ */
+function placeFood() {
+	//create a list of all valid spaces (will avoid potential lag during late-game)
+	let validSpaces = [];
+	for (let i = 0; i < gridSize; ++i) {
+		for (let r = 0; r < gridSize; ++r) {
+			validSpaces.push(i+","+r);
+		}
+	}
+	for (let i = 0; i < player.spaces.length; ++i) {
+		let index = validSpaces.indexOf(player.spaces[i][0]+","+player.spaces[i][1]);
+		validSpaces.splice(index,1);
+	}
+	foodPos = validSpaces[getRandomInt(0,validSpaces.length)].split(",");
+}
+
+/**
  * 
  * @param o: the object whose x,y coordinates we wish to update from their gridX,gridY coordinates
  */
 function calculatePositionFromGrid(o) {
 	o.x = o.gridX * gridScale;
 	o.y = o.gridY * gridScale;
+}
+
+/**
+ * get the space adjacent to the specifies grid coordinates in the desired direction
+ * @param dir: the direction in which to look for an adjacent space
+ * @param gridX: the current grid x coordinate
+ * @param gridY: the current grid y coordinate
+ * @returns a list containing the x and y value of the adjacent space 
+ */
+function getAdjacentSpace(dir,gridX,gridY) {
+	return [gridX + directionChanges[dir][0],gridY + directionChanges[dir][1]];
 }
 
 /**
@@ -190,6 +235,8 @@ function initGlobals() {
 	//create the player character
 	player = new Snake(5,8,4);
 	objects.push(player);
+	
+	placeFood();
 	
 	gameActive = true;
 }
