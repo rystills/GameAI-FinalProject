@@ -18,7 +18,11 @@ function render() {
 	//clear all canvases for a fresh render
 	clearScreen();
 	
-	drawGrid();
+	drawPlayfieldBackground();
+	
+	drawPlayer();
+	
+	drawGridlines();
 	
 	//draw all objects with images specified, centered in order of list indices
 	for (let i = 0; i < objects.length; ++i) {
@@ -32,14 +36,30 @@ function render() {
 }
 
 /**
- * draw the base grid to the screen
+ * draw the playfield to the screen
  */
-function drawGrid() {
+function drawPlayfieldBackground() {
 	//draw the playing field background
 	ctx.fillStyle = "#008800";
 	ctx.rect(0,0,gridSize*gridScale,gridSize*gridScale);
 	ctx.fill();
-	
+}
+
+function drawPlayer() {
+	//draw the player
+	ctx.fillStyle = "#0000FF";
+	ctx.beginPath();
+	for (let i = 0; i < player.spaces.length; ++i) {
+		ctx.rect(player.spaces[i][0]*gridScale,player.spaces[i][1]*gridScale,gridScale,gridScale);
+	}
+	ctx.closePath();
+	ctx.fill();
+}
+
+/**
+ * draw the gridlines on top of the playfield
+ */
+function drawGridlines() {
 	//draw the gridlines
 	ctx.strokeStyle = "#000000";
 	ctx.beginPath();
@@ -49,6 +69,7 @@ function drawGrid() {
 		ctx.moveTo(0,i*gridScale);
 		ctx.lineTo(gridScale*gridSize, i*gridScale);
 	}
+	ctx.closePath();
 	ctx.stroke();
 }
 
@@ -167,7 +188,8 @@ function initGlobals() {
 	score = 0;
 		
 	//create the player character
-	objects.push(new Snake(5,8));
+	player = new Snake(5,8,4);
+	objects.push(player);
 	
 	gameActive = true;
 }
