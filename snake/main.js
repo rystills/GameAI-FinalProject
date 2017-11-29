@@ -195,7 +195,7 @@ function loadAssets() {
 	//setup a global, ordered list of asset files to load
 	requiredFiles = [
 		"src\\util.js","src\\setupKeyListeners.js", //misc functions
-		"src\\classes\\Enum.js", "src\\classes\\Button.js", "src\\classes\\Snake.js" //classes
+		"src\\classes\\Enum.js", "src\\classes\\Snake.js" //classes
 		];
 	
 	//manually load the asset loader
