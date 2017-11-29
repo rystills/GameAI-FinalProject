@@ -123,7 +123,7 @@ function update() {
 	//draw game-over text
 	else {
 		clearScreen();
-		ctx.font = "64px Arial";
+		ctx.font = "42px Arial";
 		ctx.fillStyle = "#FF0000";
 		scoreString = "GAME OVER! FINAL SCORE: " + score;
 		textWidth = ctx.measureText(scoreString).width;
@@ -220,7 +220,7 @@ function initGlobals() {
 	totalTime = 0;
 	
 	//global game constants
-	gridScale = 20;
+	gridScale = 24;
 	gridSize = 30;
 	
 	//global game objects
