@@ -66,8 +66,11 @@ function drawPlayer() {
 	ctx.fillStyle = "#AAAAFF";
 	ctx.beginPath();
 	for (let i = 0; i < player.spaces.length; ++i) {
-		let splitSpace = player.spaces[i].split(",");
-		ctx.rect(splitSpace[0]*gridScale,splitSpace[1]*gridScale,gridScale,gridScale);
+		for (let r = 0; r < player.spaces[i].length; ++r) {
+			if (player.spaces[i][r] != -1) {
+				ctx.rect(i*gridScale,r*gridScale,gridScale,gridScale);
+			}
+		}
 	}
 	ctx.closePath();
 	ctx.fill();
@@ -143,16 +146,14 @@ function endGame() {
  * place the food at a random location not currently occupied by the player
  */
 function placeFood() {
-	//create a list of all valid spaces (will avoid potential lag during late-game)
+	//create a list of all valid spaces (spaces that are not currently occupied by the snake)
 	let validSpaces = [];
 	for (let i = 0; i < gridSize; ++i) {
 		for (let r = 0; r < gridSize; ++r) {
-			validSpaces.push(i+","+r);
+			if (player.spaces[i][r] == -1) {
+				validSpaces.push(i+","+r);	
+			}
 		}
-	}
-	for (let i = 0; i < player.spaces.length; ++i) {
-		let index = validSpaces.indexOf(player.spaces[i]);
-		validSpaces.splice(index,1);
 	}
 	foodPos = validSpaces[getRandomInt(0,validSpaces.length)].split(",");
 }
@@ -172,8 +173,12 @@ function calculatePositionFromGrid(o) {
  * @param gridX: the current grid x coordinate
  * @param gridY: the current grid y coordinate
  * @returns a list containing the x and y value of the adjacent space 
+ * @throws: direction error if dir is not one of the cardinal directions 
  */
 function getAdjacentSpace(dir,gridX,gridY) {
+	if (!directions.hasOwnProperty(dir)) {
+		throw "ERROR: getAdjacentSpace direction: '" + dir + "' not recognized";
+	}
 	return [gridX + directionChanges[dir][0],gridY + directionChanges[dir][1]];
 }
 
