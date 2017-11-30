@@ -66,7 +66,8 @@ function drawPlayer() {
 	ctx.fillStyle = "#AAAAFF";
 	ctx.beginPath();
 	for (let i = 0; i < player.spaces.length; ++i) {
-		ctx.rect(player.spaces[i][0]*gridScale,player.spaces[i][1]*gridScale,gridScale,gridScale);
+		let splitSpace = player.spaces[i].split(",");
+		ctx.rect(splitSpace[0]*gridScale,splitSpace[1]*gridScale,gridScale,gridScale);
 	}
 	ctx.closePath();
 	ctx.fill();
@@ -150,7 +151,7 @@ function placeFood() {
 		}
 	}
 	for (let i = 0; i < player.spaces.length; ++i) {
-		let index = validSpaces.indexOf(player.spaces[i][0]+","+player.spaces[i][1]);
+		let index = validSpaces.indexOf(player.spaces[i]);
 		validSpaces.splice(index,1);
 	}
 	foodPos = validSpaces[getRandomInt(0,validSpaces.length)].split(",");

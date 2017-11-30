@@ -20,7 +20,7 @@ Snake.prototype.checkUpdateDirection = function() {
 	}
 	//if the desired space is not our neck, accept the desired direction
 	let desiredSpace = getAdjacentSpace(desiredDir,this.gridX,this.gridY);
-	if (desiredSpace[0] != this.spaces[this.spaces.length-2][0] && desiredSpace[1] != this.spaces[this.spaces.length-2][1]) {
+	if (desiredSpace != this.spaces[this.spaces.length-2]) {
 		this.dir = desiredDir;
 	}
 }
@@ -49,7 +49,7 @@ Snake.prototype.spaceValid = function() {
 	
 	//next check whether or not our head is intersecting another part of our body
 	for (let i = 0; i < this.spaces.length-1; ++i) {
-		if (this.spaces[i][0] == this.gridX && this.spaces[i][1] == this.gridY) {
+		if (this.spaces[i] == this.gridX+","+this.gridY) {
 			return false;
 		}
 	}
@@ -78,7 +78,7 @@ Snake.prototype.moveForwards = function() {
 	
 	//remove one space from our tail and add one at our head
 	this.spaces.splice(0,1);
-	this.spaces.push([this.gridX,this.gridY]);
+	this.spaces.push(this.gridX+","+this.gridY);
 	
 	if (!this.spaceValid()) {
 		endGame();
@@ -103,5 +103,5 @@ function Snake(gridX,gridY,size) {
 	this.moveCompleteTime = .1;
 	
 	this.spaces = [];
-	for (let i = 0; i < size; this.spaces.push([gridX,gridY]), ++i);
+	for (let i = 0; i < size; this.spaces.push(gridX+","+gridY), ++i);
 }
