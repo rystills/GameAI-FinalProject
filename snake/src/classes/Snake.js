@@ -20,7 +20,7 @@ Snake.prototype.checkUpdateDirection = function() {
 	}
 	//if the desired space is not our neck, accept the desired direction
 	let desiredSpace = getAdjacentSpace(desiredDir,this.gridX,this.gridY);
-	if (desiredSpace != this.spaces[this.spaces.length-2]) {
+	if (desiredSpace[0] != this.neck[0] && desiredSpace[1] != this.neck[1]) {
 		this.dir = desiredDir;
 	}
 }
@@ -48,12 +48,7 @@ Snake.prototype.spaceValid = function() {
 	}
 	
 	//next check whether or not our head is intersecting another part of our body
-	for (let i = 0; i < this.spaces.length-1; ++i) {
-		if (this.spaces[i] == this.gridX+","+this.gridY) {
-			return false;
-		}
-	}
-	return true;
+	return (this.spaces[this.gridX][this.gridY] == -1 || (this.gridX == this.tail[0] && this.gridY == this.tail[1]));
 }
 
 /**
@@ -61,10 +56,11 @@ Snake.prototype.spaceValid = function() {
  */
 Snake.prototype.checkEat = function() {
 	if (this.gridX == foodPos[0] && this.gridY == foodPos[1]) {
-		this.spaces.splice(0,0,this.spaces[0]);
 		++score;
 		placeFood();
+		return true;
 	}
+	return false;
 }
 
 /**
@@ -76,15 +72,26 @@ Snake.prototype.moveForwards = function() {
 	this.gridX = adjacentSpace[0];
 	this.gridY = adjacentSpace[1];
 	
-	//remove one space from our tail and add one at our head
-	this.spaces.splice(0,1);
-	this.spaces.push(this.gridX+","+this.gridY);
-	
 	if (!this.spaceValid()) {
 		endGame();
+		return;
 	}
 	
-	this.checkEat();
+	//remove one space from our tail and add one at our head
+	this.spaces[this.gridX][this.gridY] = this.dir;
+	this.neck = this.head;
+	this.head = [this.gridX,this.gridY];
+	
+	//update our neck to point to our final head position
+	this.spaces[this.neck[0]][this.neck[1]] = this.dir;
+	
+	//remove our tail unless we just ate something
+	if (!this.checkEat()) {
+		let oldTail = this.tail;
+		this.tail = getAdjacentSpace(this.spaces[this.tail[0]][this.tail[1]],this.tail[0],this.tail[1]);
+		this.spaces[oldTail[0]][oldTail[1]] = -1;
+	}
+	
 }
 
 
@@ -103,5 +110,14 @@ function Snake(gridX,gridY,size) {
 	this.moveCompleteTime = .1;
 	
 	this.spaces = [];
-	for (let i = 0; i < size; this.spaces.push(gridX+","+gridY), ++i);
+	for (let i = 0; i < gridSize; ++i) {
+		this.spaces[i] = [];
+		for (let r = 0; r < gridSize; ++r) {
+			this.spaces[i][r] = -1;
+		}
+	}
+	for (let i = 0; i < size; this.spaces[gridX-i][gridY] = directions.right, ++i);
+	this.head = [gridX,gridY];
+	this.neck = [gridX-1,gridY];
+	this.tail = [gridX-size+1,gridY];
 }
