@@ -77,14 +77,6 @@ Snake.prototype.moveForwards = function() {
 		return;
 	}
 	
-	//remove one space from our tail and add one at our head
-	this.spaces[this.gridX][this.gridY] = this.dir;
-	this.neck = this.head;
-	this.head = [this.gridX,this.gridY];
-	
-	//update our neck to point to our final head position
-	this.spaces[this.neck[0]][this.neck[1]] = this.dir;
-	
 	//remove our tail unless we just ate something
 	if (!this.checkEat()) {
 		let oldTail = this.tail;
@@ -92,6 +84,13 @@ Snake.prototype.moveForwards = function() {
 		this.spaces[oldTail[0]][oldTail[1]] = -1;
 	}
 	
+	//add a space at our new head
+	this.spaces[this.gridX][this.gridY] = this.dir;
+	this.neck = this.head;
+	this.head = [this.gridX,this.gridY];
+	
+	//update our neck to point to our final head position
+	this.spaces[this.neck[0]][this.neck[1]] = this.dir;
 }
 
 

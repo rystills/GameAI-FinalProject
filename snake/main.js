@@ -151,11 +151,11 @@ function placeFood() {
 	for (let i = 0; i < gridSize; ++i) {
 		for (let r = 0; r < gridSize; ++r) {
 			if (player.spaces[i][r] == -1) {
-				validSpaces.push(i+","+r);	
+				validSpaces.push([i,r]);	
 			}
 		}
 	}
-	foodPos = validSpaces[getRandomInt(0,validSpaces.length)].split(",");
+	foodPos = validSpaces[getRandomInt(0,validSpaces.length)];
 }
 
 /**
