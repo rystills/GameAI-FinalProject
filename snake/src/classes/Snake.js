@@ -93,17 +93,15 @@ Snake.prototype.moveForwards = function() {
 	this.spaces[this.neck[0]][this.neck[1]] = this.dir;
 }
 
-
 /**
- * Snake class; houses the player-controlled snake, which can move around, eat food, and die
- * @param gridX: the x coordinate of the snake in the world grid
- * @param gridY: the y coordinate of the snake in the world grid
+ * initialize the snake's location and size to their starting values
  */
-function Snake(gridX,gridY,size) {
-	this.gridX = gridX;
-	this.gridY = gridY;
+Snake.prototype.init = function() {
+	this.gridX = 5;
+	this.gridY = 8;
+	this.size = 4;
 	
-	this.dir = directions.up;
+	this.dir = directions.right;
 	//move time (measured in seconds)
 	this.moveTimer = 0;
 	this.moveCompleteTime = .1;
@@ -115,8 +113,16 @@ function Snake(gridX,gridY,size) {
 			this.spaces[i][r] = -1;
 		}
 	}
-	for (let i = 0; i < size; this.spaces[gridX-i][gridY] = directions.right, ++i);
-	this.head = [gridX,gridY];
-	this.neck = [gridX-1,gridY];
-	this.tail = [gridX-size+1,gridY];
+	for (let i = 0; i < this.size; this.spaces[this.gridX-i][this.gridY] = directions.right, ++i);
+	this.head = [this.gridX,this.gridY];
+	this.neck = [this.gridX-1,this.gridY];
+	this.tail = [this.gridX-this.size+1,this.gridY];
+}
+
+
+/**
+ * Snake class; houses the player-controlled snake, which can move around, eat food, and die
+ */
+function Snake() {
+	this.init();
 }

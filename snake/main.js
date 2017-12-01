@@ -106,33 +106,50 @@ function drawHUD() {
  * main game loop; update all aspects of the game in-order
  */
 function update() {
-	if (gameActive) {
-		//update the deltaTime
-		updateTime();
-		
+	//update the deltaTime
+	updateTime();
+	
+	//update input
+	if (keyStates[" "]) {
+		restartGame();
+	}
+	
+	if (gameActive) {		
 		//update objects
 		for (let i = 0; i < objects.length; objects[i].update(), ++i);
 		
 		//update GUI elements
 		for (let i = 0; i < buttons.length; buttons[i].update(), ++i);
-		
-		//once all updates are out of the way, render the frame
-		render();
-		
-		//toggle off any one-frame event indicators at the end of the update tick
-		mousePressedLeft = false;
-		mousePressedRight = false;
 	}
 	
-	//draw game-over text
-	else {
-		clearScreen();
+	//once all updates are out of the way, render the frame
+	render();
+	
+	//draw game-over text post-render
+	
+	if (!gameActive) {
+		ctx.fillStyle = "rgba(0,0,0,.5)";
+		ctx.fillRect(0,0,cnv.width,cnv.height);
 		ctx.font = "42px Arial";
 		ctx.fillStyle = "#FF0000";
 		scoreString = "GAME OVER! FINAL SCORE: " + score;
 		textWidth = ctx.measureText(scoreString).width;
 		ctx.fillText(scoreString,cnv.width/2 - textWidth/2, cnv.height/2 + 24);
 	}
+	
+	//toggle off any one-frame event indicators at the end of the update tick
+	mousePressedLeft = false;
+	mousePressedRight = false;
+}
+
+/**
+ * restart the game
+ */
+function restartGame() {
+	score = 0;
+	player.init();
+	placeFood();
+	gameActive = true;
 }
 
 /**
@@ -239,7 +256,7 @@ function initGlobals() {
 	score = 0;
 		
 	//create the player character
-	player = new Snake(5,8,4);
+	player = new Snake();
 	objects.push(player);
 	
 	placeFood();
