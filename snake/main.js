@@ -185,18 +185,73 @@ function calculatePositionFromGrid(o) {
 }
 
 /**
- * get the space adjacent to the specifies grid coordinates in the desired direction
+ * get the direction one must face in order to travel from curSpace to destSpace
+ * @param curSpace: the starting space
+ * @param destSpace: the space at which we wish to look
+ * @returns the direction of destSpace from curSpace
+ * @throws non-adjacent space error if curSpace is not adjacent to destSpace
+ */
+function getAdjacentDir(curSpace,destSpace) {
+	if (curSpace.x == destSpace.x) {
+		if (curSpace.y == destSpace.y + 1) {
+			return directions.up;
+		}
+		if (curSpace.y == destSpace.y - 1) {
+			return directions.down;
+		}
+	}
+	if (curSpace.y == destSpace.y) {
+		if (curSpace.x == destSpace.x + 1) {
+			return directions.left;
+		}
+		if (curSpace.x == destSpace.x - 1) {
+			return directions.right;
+		}
+	}
+	throw "ERROR: getAdjacentDir space '" + curSpace.x + ", " + curSpace.y + "' is not adjacent to space '" + destSpace.x + ", " + destSpace.y + "'";
+}
+
+/**
+ * get the space adjacent to the specified grid coordinates in the desired direction
+ * @param terrain: the terrain to check against
  * @param dir: the direction in which to look for an adjacent space
  * @param gridX: the current grid x coordinate
  * @param gridY: the current grid y coordinate
- * @returns a list containing the x and y value of the adjacent space 
- * @throws: direction error if dir is not one of the cardinal directions 
+ * @returns an object containing the x and y value and type of the adjacent space
+ * @throws: direction error if dir is not one of the cardinal directions, position error if final x,y is not contained in terrain
  */
-function getAdjacentSpace(dir,gridX,gridY) {
+function getAdjacentSpace(terrain, dir,gridX,gridY) {
 	if (!directions.hasOwnProperty(dir)) {
 		throw "ERROR: getAdjacentSpace direction: '" + dir + "' not recognized";
 	}
-	return {"x":gridX + directionChanges[dir].x,"y":gridY + directionChanges[dir].y};
+	let newX = gridX + directionChanges[dir].x;
+	let newY = gridY + directionChanges[dir].y;
+	if (newX >= gridSize || newX < 0 || newY >= gridSize || gridY < 0) {
+		throw "ERROR: no block adjacent to position '" + gridX + ", " + "'" + gridY + "' in direction '" + directions[dir] + "' exists in specified terrain";
+	}
+	return {"x":newX,"y":newY, "type":(foodPos.x == newX && foodPos.y == newY ? "food" : (terrain[gridX][gridY] == -1 ? "free" : "blocked"))};
+}
+
+/**
+ * get all spaces adjacent to the specified grid coordinates
+ * @param terrain: the terrain to check against
+ * @param gridX: the current grid x coordinate
+ * @param gridY: the current grid y coordinate
+ * @returns a list of objects containing the x and y value and type of each adjacent space 
+ * @throws: direction error if dir is not one of the cardinal directions 
+ */
+function getAdjacentSpaces(terrain, gridX,gridY) {
+	var newSpaces = [];
+	for (var i = 0; i < directions.length; ++i) {
+		try {
+			newSpaces.push(getAdjacentSpace(terrain, i,gridX,gridY));	
+		}
+		//continue gracefully if an adjacent block did not exist in the specified direction
+		catch(err) {
+			continue;
+		}
+	}
+	return newSpaces;
 }
 
 /**
@@ -217,7 +272,7 @@ function initCanvases() {
 function loadAssets() {
 	//setup a global, ordered list of asset files to load
 	requiredFiles = [
-		"src\\util.js","src\\setupKeyListeners.js", //misc functions
+		"src\\util.js","src\\setupKeyListeners.js", "src\\pathFinding.js", //misc functions
 		"src\\classes\\Enum.js", "src\\classes\\Snake.js" //classes
 		];
 	

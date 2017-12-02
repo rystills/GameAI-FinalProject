@@ -24,7 +24,7 @@ Snake.prototype.checkUpdateDirection = function() {
 		desiredDir = directions.right;
 	}
 	//if the desired space is not our neck, accept the desired direction
-	let desiredSpace = getAdjacentSpace(desiredDir,this.gridX,this.gridY);
+	let desiredSpace = getAdjacentSpace(this.spaces, desiredDir,this.gridX,this.gridY);
 	if (desiredSpace.x != this.neck.x && desiredSpace.y != this.neck.y) {
 		this.dir = desiredDir;
 	}
@@ -35,8 +35,8 @@ Snake.prototype.checkUpdateDirection = function() {
  * @returns the direction in which the AI controlled snake wishes to face
  */
 Snake.prototype.AIChooseDir = function() {
-	//TODO add desired AI algorithm here (lookahead + pathfinding?)
-	return this.dir;
+	let foodPath = calculatePath(this.spaces,{"x":this.gridX,"y":this.gridY},foodPos,compareCoords,getAdjacentSpaces,spaceIsFree,true);
+	return getAdjacentDir({"x":this.gridX,"y":this.gridY}, foodPath[1]);
 }
 
 /**
@@ -82,7 +82,14 @@ Snake.prototype.checkEat = function() {
  */
 Snake.prototype.moveForwards = function() {
 	//move to our new x and y positions
-	let adjacentSpace = getAdjacentSpace(this.dir,this.gridX,this.gridY);
+	try {
+		var adjacentSpace = getAdjacentSpace(this.spaces,this.dir,this.gridX,this.gridY);
+	}
+	//if we experience an error when getting the adjacent space, we must have moved off of the grid
+	catch(err) {
+		endGame();
+		return;
+	}
 	this.gridX = adjacentSpace.x;
 	this.gridY = adjacentSpace.y;
 	
@@ -94,7 +101,7 @@ Snake.prototype.moveForwards = function() {
 	//remove our tail unless we just ate something
 	if (!this.checkEat()) {
 		let oldTail = this.tail;
-		this.tail = getAdjacentSpace(this.spaces[this.tail.x][this.tail.y],this.tail.x,this.tail.y);
+		this.tail = getAdjacentSpace(this.spaces,this.spaces[this.tail.x][this.tail.y],this.tail.x,this.tail.y);
 		this.spaces[oldTail.x][oldTail.y] = -1;
 	}
 	

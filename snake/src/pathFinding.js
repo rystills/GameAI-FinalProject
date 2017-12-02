@@ -1,3 +1,18 @@
+//hard-coded heuristic weights for linear and manhattan distance, respectively
+heuristic1Weight = 1;
+heuristic2Weight = 0;
+
+/**
+ * helper function for calculatePath: check whether or not the specified space in the terrain is free
+ * @param terrain: the terrain to check against
+ * @param x: the x coordinate of the space we should check
+ * @param y: the y coordinate of the space we should check
+ * @returns: whether the desired space is free (true) or not (false)
+ */
+function spaceIsFree(terrain,x,y) {
+	return terrain[x][y] == -1;
+}
+
 /**
  * goal condition function for calculatePath: check whether or not two objects have the same x,y coordinates
  * @param a: the first object to check
@@ -54,42 +69,6 @@ function composePath(startSpace, goalSpace) {
 		path.unshift(curSpace);
 	}
 	return path;
-}
-
-/**
- * calculate the shortest path in a terrain from one space to another, utilizing waypoints to speed up the search
- * @param terrain: the terrain in which to search for a path
- * @param waypoints: the waypoints to assist in our search for a path
- * @param startSpace: the space on which to begin the search
- * @param goalSpace: the desired goal space
- * @returns the shortest path from the start space to the goal space
- */
-function calculatePathWaypoints(terrain,waypoints,startSpace,goalSpace) {	
-	path = [];
-	//if the start space is the goal space, then the path is just that space
-	if (startSpace == goalSpace) {
-		return [startSpace];
-	}
-	
-	//grab the nearest waypoint to both the start space and the goal space
-	startWaypoint = calculatePath(terrain, startSpace, waypoints, containerIsWaypoint, adjacentContainers, containerWalkable, false).last();
-	var startClosedSet = closedSet;
-	var startPath = path;
-	
-	goalWaypoint = calculatePath(terrain, goalSpace, waypoints, containerIsWaypoint, adjacentContainers, containerWalkable, false).last();
-	
-	console.log(startWaypoint);
-	//preserve the state of the closedSet and path so we can combine it all at the end for visual display of pathfinding process
-	var waypointsClosedSet = closedSet.concat(startClosedSet);
-	var waypointsPath = path.concat(startPath);
-	
-	var finalPath = calculatePath(waypoints, startWaypoint, goalWaypoint, compareCoords, adjacentWaypoints, function() {return true}, true);
-	
-	//finally, concatenate the closedSet and path once more so we retain the nodes explored during waypoint discovery
-	closedSet = closedSet.concat(waypointsClosedSet);
-	finalPath = finalPath.concat(waypointsPath);
-	
-	return finalPath;
 }
 
 /**
