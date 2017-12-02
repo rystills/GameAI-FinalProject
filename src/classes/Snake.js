@@ -1,10 +1,15 @@
 directions = new Enum("up","left", "down", "right");
+controlModes = new Enum("human","AI");
 directionChanges = new Enum([0,-1],[-1,0],[0,1],[1,0]);
 
 /**
  * check if the user is attempting to change directions
  */
 Snake.prototype.checkUpdateDirection = function() {
+	if (this.controlMode != controlModes.human) {
+		return;
+	}
+	
 	let desiredDir = this.dir;
 	if (keyStates["W"]) {
 		desiredDir = directions.up;
@@ -23,6 +28,15 @@ Snake.prototype.checkUpdateDirection = function() {
 	if (desiredSpace[0] != this.neck[0] && desiredSpace[1] != this.neck[1]) {
 		this.dir = desiredDir;
 	}
+}
+
+/**
+ * have the AI controlled snake choose the next direction in which to face
+ * @returns the direction in which the AI controlled snake wishes to face
+ */
+Snake.prototype.AIChooseDir = function() {
+	//TODO add desired AI algorithm here (lookahead + pathfinding?)
+	return this.dir;
 }
 
 /**
@@ -91,6 +105,12 @@ Snake.prototype.moveForwards = function() {
 	
 	//update our neck to point to our final head position
 	this.spaces[this.neck[0]][this.neck[1]] = this.dir;
+	
+	//choose where we will want to move next if we are the AI
+	if (this.controlMode == controlModes.AI) {
+		this.dir = this.AIChooseDir();
+		
+	}
 }
 
 /**
@@ -104,7 +124,7 @@ Snake.prototype.init = function() {
 	this.dir = directions.right;
 	//move time (measured in seconds)
 	this.moveTimer = 0;
-	this.moveCompleteTime = .1;
+	this.moveCompleteTime = .08;
 	
 	this.spaces = [];
 	for (let i = 0; i < gridSize; ++i) {
@@ -122,7 +142,9 @@ Snake.prototype.init = function() {
 
 /**
  * Snake class; houses the player-controlled snake, which can move around, eat food, and die
+ * @param controlMode: the mode defining whether the snake is controlled by the Player, or by the AI
  */
-function Snake() {
+function Snake(controlMode) {
+	this.controlMode = controlMode;
 	this.init();
 }
