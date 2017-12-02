@@ -290,7 +290,7 @@ function loadAssets() {
  */
 function initGlobals() {
 	//keep a global fps flag for game-speed (although all speeds should use deltaTime)
-	fps = 10;
+	fps = 1000;
 	
 	//init global time vars for delta time calculation
 	prevTime = Date.now();
@@ -299,7 +299,7 @@ function initGlobals() {
 	
 	//global game constants
 	gridScale = 24;
-	gridSize = 10;
+	gridSize = 30;
 	
 	//global game objects
 	objects = [];
