@@ -35,6 +35,18 @@ function render() {
 	
 	//finally draw the HUD
 	drawHUD();
+	
+	
+	//draw game-over text post-render
+	if (!gameActive) {
+		ctx.fillStyle = "rgba(0,0,0,.5)";
+		ctx.fillRect(0,0,cnv.width,cnv.height);
+		ctx.font = "42px Arial";
+		ctx.fillStyle = "#FF0000";
+		scoreString = "GAME OVER! FINAL SCORE: " + score;
+		textWidth = ctx.measureText(scoreString).width;
+		ctx.fillText(scoreString,cnv.width/2 - textWidth/2, cnv.height/2 + 24);
+	}
 }
 
 /**
@@ -124,18 +136,6 @@ function update() {
 	
 	//once all updates are out of the way, render the frame
 	render();
-	
-	//draw game-over text post-render
-	
-	if (!gameActive) {
-		ctx.fillStyle = "rgba(0,0,0,.5)";
-		ctx.fillRect(0,0,cnv.width,cnv.height);
-		ctx.font = "42px Arial";
-		ctx.fillStyle = "#FF0000";
-		scoreString = "GAME OVER! FINAL SCORE: " + score;
-		textWidth = ctx.measureText(scoreString).width;
-		ctx.fillText(scoreString,cnv.width/2 - textWidth/2, cnv.height/2 + 24);
-	}
 	
 	//toggle off any one-frame event indicators at the end of the update tick
 	mousePressedLeft = false;
@@ -256,7 +256,7 @@ function initGlobals() {
 	score = 0;
 		
 	//create the player character
-	player = new Snake();
+	player = new Snake(controlModes.AI);
 	objects.push(player);
 	
 	placeFood();
