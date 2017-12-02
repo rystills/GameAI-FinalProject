@@ -36,7 +36,11 @@ Snake.prototype.checkUpdateDirection = function() {
  */
 Snake.prototype.AIChooseDir = function() {
 	let foodPath = calculatePath(this.spaces,{"x":this.gridX,"y":this.gridY},foodPos,compareCoords,getAdjacentSpaces,spaceIsFree,true);
-	return getAdjacentDir({"x":this.gridX,"y":this.gridY}, foodPath[1]);
+	//if we couldn't find a valid path, simply move forward for now
+	if (foodPath.length > 1) {
+		return getAdjacentDir({"x":this.gridX,"y":this.gridY}, foodPath[1]);	
+	}
+	return this.dir;
 }
 
 /**
@@ -131,7 +135,7 @@ Snake.prototype.init = function() {
 	this.dir = directions.right;
 	//move time (measured in seconds)
 	this.moveTimer = 0;
-	this.moveCompleteTime = .08;
+	this.moveCompleteTime = .001;
 	
 	this.spaces = [];
 	for (let i = 0; i < gridSize; ++i) {
