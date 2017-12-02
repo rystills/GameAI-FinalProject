@@ -1,6 +1,6 @@
 directions = new Enum("up","left", "down", "right");
 controlModes = new Enum("human","AI");
-directionChanges = new Enum([0,-1],[-1,0],[0,1],[1,0]);
+directionChanges = new Enum({"x":0,"y":-1},{"x":-1,"y":0},{"x":0,"y":1},{"x":1,"y":0});
 
 /**
  * check if the user is attempting to change directions
@@ -25,7 +25,7 @@ Snake.prototype.checkUpdateDirection = function() {
 	}
 	//if the desired space is not our neck, accept the desired direction
 	let desiredSpace = getAdjacentSpace(desiredDir,this.gridX,this.gridY);
-	if (desiredSpace[0] != this.neck[0] && desiredSpace[1] != this.neck[1]) {
+	if (desiredSpace.x != this.neck.x && desiredSpace.y != this.neck.y) {
 		this.dir = desiredDir;
 	}
 }
@@ -62,14 +62,14 @@ Snake.prototype.spaceValid = function() {
 	}
 	
 	//next check whether or not our head is intersecting another part of our body
-	return (this.spaces[this.gridX][this.gridY] == -1 || (this.gridX == this.tail[0] && this.gridY == this.tail[1]));
+	return (this.spaces[this.gridX][this.gridY] == -1 || (this.gridX == this.tail.x && this.gridY == this.tail.y));
 }
 
 /**
  * check if we have just landed on some food
  */
 Snake.prototype.checkEat = function() {
-	if (this.gridX == foodPos[0] && this.gridY == foodPos[1]) {
+	if (this.gridX == foodPos.x && this.gridY == foodPos.y) {
 		++score;
 		placeFood();
 		return true;
@@ -83,8 +83,8 @@ Snake.prototype.checkEat = function() {
 Snake.prototype.moveForwards = function() {
 	//move to our new x and y positions
 	let adjacentSpace = getAdjacentSpace(this.dir,this.gridX,this.gridY);
-	this.gridX = adjacentSpace[0];
-	this.gridY = adjacentSpace[1];
+	this.gridX = adjacentSpace.x;
+	this.gridY = adjacentSpace.y;
 	
 	if (!this.spaceValid()) {
 		endGame();
@@ -94,17 +94,17 @@ Snake.prototype.moveForwards = function() {
 	//remove our tail unless we just ate something
 	if (!this.checkEat()) {
 		let oldTail = this.tail;
-		this.tail = getAdjacentSpace(this.spaces[this.tail[0]][this.tail[1]],this.tail[0],this.tail[1]);
-		this.spaces[oldTail[0]][oldTail[1]] = -1;
+		this.tail = getAdjacentSpace(this.spaces[this.tail.x][this.tail.y],this.tail.x,this.tail.y);
+		this.spaces[oldTail.x][oldTail.y] = -1;
 	}
 	
 	//add a space at our new head
 	this.spaces[this.gridX][this.gridY] = this.dir;
 	this.neck = this.head;
-	this.head = [this.gridX,this.gridY];
+	this.head = {"x":this.gridX,"y":this.gridY};
 	
 	//update our neck to point to our final head position
-	this.spaces[this.neck[0]][this.neck[1]] = this.dir;
+	this.spaces[this.neck.x][this.neck.y] = this.dir;
 	
 	//choose where we will want to move next if we are the AI
 	if (this.controlMode == controlModes.AI) {
@@ -134,9 +134,9 @@ Snake.prototype.init = function() {
 		}
 	}
 	for (let i = 0; i < this.size; this.spaces[this.gridX-i][this.gridY] = directions.right, ++i);
-	this.head = [this.gridX,this.gridY];
-	this.neck = [this.gridX-1,this.gridY];
-	this.tail = [this.gridX-this.size+1,this.gridY];
+	this.head = {"x":this.gridX,"y":this.gridY};
+	this.neck = {"x":this.gridX-1,"y":this.gridY};
+	this.tail = {"x":this.gridX-this.size+1,"y":this.gridY};
 }
 
 

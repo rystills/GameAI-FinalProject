@@ -65,7 +65,7 @@ function drawPlayfieldBackground() {
 function drawFood() {
 	ctx.fillStyle = "#FF0000";
 	ctx.beginPath();
-	ctx.rect(foodPos[0]*gridScale,foodPos[1]*gridScale,gridScale,gridScale);
+	ctx.rect(foodPos.x*gridScale,foodPos.y*gridScale,gridScale,gridScale);
 	ctx.closePath();
 	ctx.fill();
 }
@@ -168,7 +168,7 @@ function placeFood() {
 	for (let i = 0; i < gridSize; ++i) {
 		for (let r = 0; r < gridSize; ++r) {
 			if (player.spaces[i][r] == -1) {
-				validSpaces.push([i,r]);	
+				validSpaces.push({"x":i,"y":r});	
 			}
 		}
 	}
@@ -196,7 +196,7 @@ function getAdjacentSpace(dir,gridX,gridY) {
 	if (!directions.hasOwnProperty(dir)) {
 		throw "ERROR: getAdjacentSpace direction: '" + dir + "' not recognized";
 	}
-	return [gridX + directionChanges[dir][0],gridY + directionChanges[dir][1]];
+	return {"x":gridX + directionChanges[dir].x,"y":gridY + directionChanges[dir].y};
 }
 
 /**
