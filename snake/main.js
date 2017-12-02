@@ -167,7 +167,7 @@ function placeFood() {
 	let validSpaces = [];
 	for (let i = 0; i < gridSize; ++i) {
 		for (let r = 0; r < gridSize; ++r) {
-			if (player.spaces[i][r] == -1) {
+			if (player.spaces[i][r] == -1 && !(player.gridX == i && player.gridY == r)) {
 				validSpaces.push({"x":i,"y":r});	
 			}
 		}
@@ -290,7 +290,7 @@ function loadAssets() {
  */
 function initGlobals() {
 	//keep a global fps flag for game-speed (although all speeds should use deltaTime)
-	fps = 60;
+	fps = 10;
 	
 	//init global time vars for delta time calculation
 	prevTime = Date.now();
@@ -299,7 +299,7 @@ function initGlobals() {
 	
 	//global game constants
 	gridScale = 24;
-	gridSize = 30;
+	gridSize = 10;
 	
 	//global game objects
 	objects = [];
