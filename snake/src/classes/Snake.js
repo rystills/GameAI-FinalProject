@@ -24,8 +24,14 @@ Snake.prototype.checkUpdateDirection = function() {
 		desiredDir = directions.right;
 	}
 	//if the desired space is not our neck, accept the desired direction
-	let desiredSpace = getAdjacentSpace(this.spaces, desiredDir,this.gridX,this.gridY);
-	if (desiredSpace.x != this.neck.x && desiredSpace.y != this.neck.y) {
+	try {
+		let desiredSpace = getAdjacentSpace(this.spaces, desiredDir,this.gridX,this.gridY);
+		if (desiredSpace.x != this.neck.x && desiredSpace.y != this.neck.y) {
+			this.dir = desiredDir;
+		}
+	}
+	//safely ignore out of bounds errors when a human's desired direction takes them off of the grid
+	catch(err) {
 		this.dir = desiredDir;
 	}
 }
@@ -49,7 +55,7 @@ Snake.prototype.AIChooseDir = function() {
 Snake.prototype.update = function() {
 	this.checkUpdateDirection();
 	this.moveTimer += deltaTime;
-	if (this.moveTimer >= this.moveCompleteTime) {
+	while (this.moveTimer >= this.moveCompleteTime) {
 		this.moveTimer -= this.moveCompleteTime;
 		this.moveForwards();
 	}
@@ -135,7 +141,6 @@ Snake.prototype.init = function() {
 	this.dir = directions.right;
 	//move time (measured in seconds)
 	this.moveTimer = 0;
-	this.moveCompleteTime = .001;
 	
 	this.spaces = [];
 	for (let i = 0; i < gridSize; ++i) {
@@ -157,5 +162,6 @@ Snake.prototype.init = function() {
  */
 function Snake(controlMode) {
 	this.controlMode = controlMode;
+	this.moveCompleteTime = .01;
 	this.init();
 }
