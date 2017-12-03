@@ -1,6 +1,7 @@
 directions = new Enum("up","left", "down", "right");
 controlModes = new Enum("human","AI");
 directionChanges = new Enum({"x":0,"y":-1},{"x":-1,"y":0},{"x":0,"y":1},{"x":1,"y":0});
+algorithms = new Enum("naive","hamiltonian")
 
 /**
  * check if the user is attempting to change directions
@@ -37,16 +38,37 @@ Snake.prototype.checkUpdateDirection = function() {
 }
 
 /**
- * have the AI controlled snake choose the next direction in which to face
- * @returns the direction in which the AI controlled snake wishes to face
+ * choose the next direction in which to face using the naive algorithm
  */
-Snake.prototype.AIChooseDir = function() {
+Snake.prototype.chooseDirNaive = function() {
 	let foodPath = calculatePath(this.spaces,{"x":this.gridX,"y":this.gridY},foodPos,compareCoords,getAdjacentSpaces,spaceIsFree,true);
 	//if we couldn't find a valid path, simply move forward for now
 	if (foodPath.length > 1) {
 		return getAdjacentDir({"x":this.gridX,"y":this.gridY}, foodPath[1]);	
 	}
+	return this.dir;	
+}
+
+/**
+ * choose the next direction in which to face using the hamiltonian algorithm
+ */
+Snake.prototype.chooseDirHamiltonian = function() {
+	//TODO fill me in
 	return this.dir;
+}
+
+/**
+ * have the AI controlled snake choose the next direction in which to face
+ * @returns the direction in which the AI controlled snake wishes to face
+ */
+Snake.prototype.AIChooseDir = function() {
+	switch (this.algorithm) {
+		case algorithms.naive:
+			return this.chooseDirNaive();
+			
+		case algorithms.hamiltonian:
+			return this.chooseDirHamiltonian();
+	}
 }
 
 /**
@@ -163,5 +185,6 @@ Snake.prototype.init = function() {
 function Snake(controlMode) {
 	this.controlMode = controlMode;
 	this.moveCompleteTime = .01;
+	this.algorithm = algorithms.hamiltonian;
 	this.init();
 }

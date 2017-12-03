@@ -194,7 +194,9 @@ function changeControlMode() {
 /**
  * toggle the snake AI algorithm
  */
-function changeAlgorithm() {
+function changeSnakeAlgorithm() {
+	player.algorithm = (player.algorithm == algorithms.naive ? algorithms.hamiltonian : algorithms.naive);
+	this.text = "AI Algorithm: " + (player.algorithm == algorithms.naive ? "Naive" : "Hamiltonian");
 }
 
 /**
@@ -354,7 +356,7 @@ function initGlobals() {
 	buttons = [];
 	buttons.push(new Button(10,50,uicnv,"Restart Game",24,restartGame));
 	buttons.push(new Button(10,100,uicnv,"Game Mode: Human",24,changeControlMode));
-	buttons.push(new Button(10,150,uicnv,"AI Algorithm: naive",24,changeAlgorithm));
+	buttons.push(new Button(10,150,uicnv,"AI Algorithm: Hamiltonian",24,changeSnakeAlgorithm));
 	buttons.push(new Button(10,200,uicnv,"Snake Speed: 1000",24,changeSnakeSpeed));
 	
 	//global counters
@@ -371,6 +373,7 @@ function initGlobals() {
 	//toggle all button functions to set them to the desired default state, while retaining the width necessary to fit the largest state string
 	buttons[1].function();
 	for (let i = 0; i < 3; buttons[3].function(), ++i);
+	buttons[2].function();
 }
 
 //disallow right-click context menu as right click functionality is necessary for block removal
