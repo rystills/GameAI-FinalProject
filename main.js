@@ -109,6 +109,30 @@ function drawGridlines() {
  * draw the HUD
  */
 function drawHUD() {
+	//draw buttons
+	for (var i = 0; i < buttons.length; ++i) {
+		var btnctx = buttons[i].canvas.getContext("2d");
+		//fill light blue border color
+		btnctx.fillStyle = "rgb(" +  
+		Math.round(.15 * buttons[i].blendWhiteness) + ", " + 
+		Math.round(buttons[i].blendWhiteness *.75) + ", " + 
+		Math.round(.1 * buttons[i].blendWhiteness) + ")";
+		btnctx.fillRect(buttons[i].x, buttons[i].y, buttons[i].width,buttons[i].height);
+		
+		//fill blue inner color
+		btnctx.fillStyle = "rgb(" + 
+		Math.round(buttons[i].blendWhiteness *.1) + ", " + 
+		Math.round(.15 * buttons[i].blendWhiteness) + ", " + 
+		Math.round(.75 * buttons[i].blendWhiteness) + ")";
+		btnctx.fillRect(buttons[i].x + 2, buttons[i].y + 2, buttons[i].width - 4,buttons[i].height - 4);
+		
+		//set the font size and color depending on the button's attributes and state
+		btnctx.font = buttons[i].fontSize + "px Arial";
+		btnctx.fillStyle = "rgb(" + buttons[i].blendWhiteness + ", " + buttons[i].blendWhiteness + ", " + buttons[i].blendWhiteness + ")";
+		
+		//draw the button label (add slight position offset to account for line spacing)
+		btnctx.fillText(buttons[i].text,buttons[i].x + 4, buttons[i].y + buttons[i].height/2 + 8);
+	}
 	uictx.font = "24px Arial";
 	uictx.fillStyle = "#FFFFFF";
 	uictx.fillText("Score: " + score, 10,30);
@@ -129,10 +153,10 @@ function update() {
 	if (gameActive) {		
 		//update objects
 		for (let i = 0; i < objects.length; objects[i].update(), ++i);
-		
-		//update GUI elements
-		for (let i = 0; i < buttons.length; buttons[i].update(), ++i);
 	}
+	
+	//update GUI elements
+	for (let i = 0; i < buttons.length; buttons[i].update(), ++i);
 	
 	//once all updates are out of the way, render the frame
 	render();
@@ -157,6 +181,28 @@ function restartGame() {
  */
 function endGame() {
 	gameActive = false;
+}
+
+/**
+ * toggle the snake control mode between human and AI
+ */
+function changeControlMode() {
+	player.controlMode = (player.controlMode == controlModes.human ? controlModes.AI : controlModes.human);
+	this.text = "Game Mode: " + (player.controlMode == controlModes.human ? "Human" : "AI");
+}
+
+/**
+ * toggle the snake AI algorithm
+ */
+function changeAlgorithm() {
+}
+
+/**
+ * toggle the snake speed between .1, .01, and .001
+ */
+function changeSnakeSpeed() {
+	player.moveCompleteTime = (player.moveCompleteTime == .1 ? .01 : (player.moveCompleteTime == .01 ? .001 : .1));
+	this.text = "Snake Speed: " + 1/player.moveCompleteTime;
 }
 
 /**
@@ -273,7 +319,7 @@ function loadAssets() {
 	//setup a global, ordered list of asset files to load
 	requiredFiles = [
 		"src\\util.js","src\\setupKeyListeners.js", "src\\pathFinding.js", //misc functions
-		"src\\classes\\Enum.js", "src\\classes\\Snake.js" //classes
+		"src\\classes\\Enum.js", "src\\classes\\Button.js", "src\\classes\\Snake.js" //classes
 		];
 	
 	//manually load the asset loader
@@ -290,7 +336,7 @@ function loadAssets() {
  */
 function initGlobals() {
 	//keep a global fps flag for game-speed (although all speeds should use deltaTime)
-	fps = 1000;
+	fps = 9999;
 	
 	//init global time vars for delta time calculation
 	prevTime = Date.now();
@@ -306,17 +352,25 @@ function initGlobals() {
 	
 	//global list of UI buttons
 	buttons = [];
+	buttons.push(new Button(10,50,uicnv,"Restart Game",24,restartGame));
+	buttons.push(new Button(10,100,uicnv,"Game Mode: Human",24,changeControlMode));
+	buttons.push(new Button(10,150,uicnv,"AI Algorithm: naive",24,changeAlgorithm));
+	buttons.push(new Button(10,200,uicnv,"Snake Speed: 1000",24,changeSnakeSpeed));
 	
 	//global counters
 	score = 0;
 		
 	//create the player character
-	player = new Snake(controlModes.AI);
+	player = new Snake(controlModes.human);
 	objects.push(player);
 	
 	placeFood();
 	
 	gameActive = true;
+	
+	//toggle all button functions to set them to the desired default state, while retaining the width necessary to fit the largest state string
+	buttons[1].function();
+	for (let i = 0; i < 3; buttons[3].function(), ++i);
 }
 
 //disallow right-click context menu as right click functionality is necessary for block removal
