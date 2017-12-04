@@ -74,7 +74,7 @@ Snake.prototype.chooseDirHamiltonian = function() {
 
 	temp = this.head.x-1
 	nextLeft = this.head.x-1 + "," + this.head.y;
-	
+
 	temp = this.head.y-1
 	nextUp = this.head.x + "," + temp;
 	
@@ -168,6 +168,7 @@ Snake.prototype.moveForwards = function() {
 	this.gridY = adjacentSpace.y;
 	
 	if (!this.spaceValid()) {
+		this.visitedQueue = []
 		endGame();
 		return;
 	}
