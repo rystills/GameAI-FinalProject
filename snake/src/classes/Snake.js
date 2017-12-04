@@ -3,6 +3,8 @@ controlModes = new Enum("human","AI");
 directionChanges = new Enum({"x":0,"y":-1},{"x":-1,"y":0},{"x":0,"y":1},{"x":1,"y":0});
 algorithms = new Enum("naive","hamiltonian")
 
+Snake.prototype.visitedQueue = []
+
 /**
  * check if the user is attempting to change directions
  */
@@ -53,7 +55,46 @@ Snake.prototype.chooseDirNaive = function() {
  * choose the next direction in which to face using the hamiltonian algorithm
  */
 Snake.prototype.chooseDirHamiltonian = function() {
-	//TODO fill me in
+	if (this.size < 20) {
+		return this.chooseDirNaive();
+	}
+
+	if (this.visitedQueue.length >= 899) {
+		// Grid is 30x30, so 900 tiles
+		this.visitedQueue.shift();
+	}
+
+	curLoc = this.head.x + "," + this.head.y;
+
+	temp = this.head.x + 1;
+	nextRight = temp + "," + this.head.y;
+
+	temp = this.head.y+1
+	nextDown = this.head.x + "," + temp;
+
+	temp = this.head.x-1
+	nextLeft = this.head.x-1 + "," + this.head.y;
+	
+	temp = this.head.y-1
+	nextUp = this.head.x + "," + temp;
+	
+	if (this.visitedQueue.indexOf(curLoc) == -1) {
+		// If current location is not in visitedQueue,
+		// push it to the queue
+		this.visitedQueue.push(curLoc);
+	}
+	
+	// Tries to go right first, then down, then left, then up
+	if (this.visitedQueue.indexOf(nextRight) == -1 && this.head.x != 29) {
+		return directions.right;
+	} else if (this.visitedQueue.indexOf(nextDown) == -1 && this.head.y != 29) {
+		return directions.down;
+	} else if (this.visitedQueue.indexOf(nextLeft) == -1 && this.head.x != 0) {
+		return directions.left;
+	} else {
+		return directions.up;
+	}
+
 	return this.dir;
 }
 
@@ -103,6 +144,7 @@ Snake.prototype.spaceValid = function() {
 Snake.prototype.checkEat = function() {
 	if (this.gridX == foodPos.x && this.gridY == foodPos.y) {
 		++score;
+		++this.size;
 		placeFood();
 		return true;
 	}
