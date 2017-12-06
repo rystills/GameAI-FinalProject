@@ -43,10 +43,35 @@ Snake.prototype.checkUpdateDirection = function() {
  * choose the next direction in which to face using a naive perfect algorithm
  */
 Snake.prototype.chooseDirNaivePerfect = function() {
+	//optimization; if size is <= gridSize, simply use the shortest path to the food
+	if (this.size < gridSize) {
+		return this.chooseDirNaive();
+	}
+	//after optimization, path to just shy of topright corner, then path to just shy of topleft corner, to reset the body
+	if (this.size == gridSize) {
+		if (this.optimizationState == 0) {
+			let cornerPath = calculatePath(this.spaces,{"x":this.gridX,"y":this.gridY},{"x":gridSize-2,"y":1},compareCoords,getAdjacentSpaces,spaceIsFree,true);
+			if (cornerPath.length > 1) {
+				return getAdjacentDir({"x":this.gridX,"y":this.gridY}, cornerPath[1]);
+			}
+			this.optimizationState += 1;
+			return this.chooseDirNaivePerfect();
+		}
+		if (this.optimizationState == 1) {
+			let cornerPath = calculatePath(this.spaces,{"x":this.gridX,"y":this.gridY},{"x":1,"y":1},compareCoords,getAdjacentSpaces,spaceIsFree,true);
+			if (cornerPath.length > 1) {
+				return getAdjacentDir({"x":this.gridX,"y":this.gridY}, cornerPath[1]);
+			}
+			this.optimizationState += 1;
+			//finally, move down so that we don't get stuck on ourselves
+			return directions.down;
+		}
+	}
+	
 	//optimization; if we are directly above the food and there is no body part below it, simply move down
 	//this optimization fails; if the snake takes a shortcut, and then runs into a constant stream of food, it has no way of recovering
-	if ((this.takingShortCut) || foodPos.x == this.gridX && this.gridY < foodPos.y && this.gridX != gridSize-1 && (foodPos.y == gridSize - 1 || getAdjacentSpace(this.spaces,directions.down,foodPos.x,foodPos.y).type == "free") && (this.gridY == 0)) {
-		this.takingShortCut = true;
+	if ((this.optimizationState == 1) || foodPos.x == this.gridX && this.gridY < foodPos.y && this.gridX != gridSize-1 && (foodPos.y == gridSize - 1 || getAdjacentSpace(this.spaces,directions.down,foodPos.x,foodPos.y).type == "free") && (this.gridY == 0)) {
+		this.optimizationState = 1;
 		return directions.down;
 	}
 	//in the bottom right corner, we move up
@@ -86,11 +111,20 @@ Snake.prototype.chooseDirNaivePerfect = function() {
  */
 Snake.prototype.chooseDirNaive = function() {
 	let foodPath = calculatePath(this.spaces,{"x":this.gridX,"y":this.gridY},foodPos,compareCoords,getAdjacentSpaces,spaceIsFree,true);
-	//if we couldn't find a valid path, simply move forward for now
+	//if we found a path to the food, go there
 	if (foodPath.length > 1) {
 		return getAdjacentDir({"x":this.gridX,"y":this.gridY}, foodPath[1]);	
 	}
-	return this.dir;	
+	//no path to food was found; move forward unless it will kill us
+	try {
+		getAdjacentSpace(this.spaces,this.dir,this.gridX,this.gridY);
+		return this.dir;
+	}
+	//moving forward will kill us, so turn 90 degrees counterclockwise
+	catch (err) {
+		return (this.dir+1)%4;
+	}
+		
 }
 
 /**
@@ -204,7 +238,7 @@ Snake.prototype.checkEat = function() {
 	if (this.gridX == foodPos.x && this.gridY == foodPos.y) {
 		++score;
 		++this.size;
-		this.takingShortCut = false;
+		this.optimizationState = 0;
 		placeFood();
 		return true;
 	}
@@ -278,8 +312,8 @@ Snake.prototype.init = function() {
 	this.neck = {"x":this.gridX-1,"y":this.gridY};
 	this.tail = {"x":this.gridX-this.size+1,"y":this.gridY};
 	
-	//optimization bool
-	this.takingShortCut = false;
+	//optimization state
+	this.optimizationState = 0;
 }
 
 
