@@ -203,7 +203,7 @@ function changeSnakeAlgorithm() {
  * toggle the snake speed between .1, .01, and .001
  */
 function changeSnakeSpeed() {
-	player.moveCompleteTime = (player.moveCompleteTime == .1 ? .01 : (player.moveCompleteTime == .01 ? .001 : .1));
+	player.moveCompleteTime = (player.moveCompleteTime == .1 ? .01 : (player.moveCompleteTime == .01 ? .005 : (player.moveCompleteTime == .005 ? .001 :.1)));
 	this.text = "Snake Speed: " + 1/player.moveCompleteTime;
 }
 
@@ -347,7 +347,7 @@ function initGlobals() {
 	
 	//global game constants
 	gridScale = 24;
-	gridSize = 18;
+	gridSize = 14;
 	
 	//global game objects
 	objects = [];
