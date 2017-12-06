@@ -142,11 +142,11 @@ Snake.prototype.chooseDirMaxPath = function() {
  * choose the next direction in which to face using the hamiltonian algorithm
  */
 Snake.prototype.chooseDirHamiltonian = function() {
-	if (this.size < 20) {
+	if (this.size < 16) {
 		return this.chooseDirNaive();
 	}
 
-	if (this.visitedQueue.length >= 899) {
+	if (this.visitedQueue.length >= 50) {
 		// Grid is 30x30, so 900 tiles
 		this.visitedQueue.shift();
 	}
@@ -172,9 +172,9 @@ Snake.prototype.chooseDirHamiltonian = function() {
 	}
 	
 	// Tries to go right first, then down, then left, then up
-	if (this.visitedQueue.indexOf(nextRight) == -1 && this.head.x != 29) {
+	if (this.visitedQueue.indexOf(nextRight) == -1 && this.head.x != 13) {
 		return directions.right;
-	} else if (this.visitedQueue.indexOf(nextDown) == -1 && this.head.y != 29) {
+	} else if (this.visitedQueue.indexOf(nextDown) == -1 && this.head.y != 13) {
 		return directions.down;
 	} else if (this.visitedQueue.indexOf(nextLeft) == -1 && this.head.x != 0) {
 		return directions.left;
