@@ -1,7 +1,7 @@
 directions = new Enum("up","left", "down", "right");
 controlModes = new Enum("human","AI");
 directionChanges = new Enum({"x":0,"y":-1},{"x":-1,"y":0},{"x":0,"y":1},{"x":1,"y":0});
-algorithms = new Enum("naive","hamiltonian")
+algorithms = new Enum("naive","hamiltonian", "naivePerfect");
 
 Snake.prototype.visitedQueue = []
 
@@ -36,6 +36,39 @@ Snake.prototype.checkUpdateDirection = function() {
 	//safely ignore out of bounds errors when a human's desired direction takes them off of the grid
 	catch(err) {
 		this.dir = desiredDir;
+	}
+}
+
+/**
+ * choose the next direction in which to face using a naive perfect algorithm
+ */
+Snake.prototype.chooseDirNaivePerfect = function() {
+	//in the bottom right corner, we move up
+	if (this.gridY == gridSize-1 && this.gridX == gridSize-1) {
+		return directions.up;
+	}
+	//if we are on the right side, move up until we hit the top, then move left
+	if (this.gridX == gridSize-1) {
+		if (this.gridY == 0) {
+			return directions.left;
+		}
+		return directions.up;
+	}
+	
+	//if we are on an even row, move left until we hit the wall, then move down
+	if (this.gridY%2 == 0) {
+		if (this.gridX == 0) {
+			return directions.down;
+		}
+		return directions.left;
+	}
+	
+	//if we are on an odd row, move right until we hit one shy of the wall unless we are at the bottom of the grid, then move down
+	if (this.gridY%2 != 0) {
+		if (this.gridX == gridSize - 2 && this.gridY != gridSize-1) {
+			return directions.down;
+		}
+		return directions.right;
 	}
 }
 
@@ -109,6 +142,9 @@ Snake.prototype.AIChooseDir = function() {
 			
 		case algorithms.hamiltonian:
 			return this.chooseDirHamiltonian();
+		
+		case algorithms.naivePerfect:
+			return this.chooseDirNaivePerfect();
 	}
 }
 
@@ -191,7 +227,6 @@ Snake.prototype.moveForwards = function() {
 	//choose where we will want to move next if we are the AI
 	if (this.controlMode == controlModes.AI) {
 		this.dir = this.AIChooseDir();
-		
 	}
 }
 
@@ -200,7 +235,7 @@ Snake.prototype.moveForwards = function() {
  */
 Snake.prototype.init = function() {
 	this.gridX = 5;
-	this.gridY = 8;
+	this.gridY = 1;
 	this.size = 4;
 	
 	this.dir = directions.right;
@@ -228,6 +263,6 @@ Snake.prototype.init = function() {
 function Snake(controlMode) {
 	this.controlMode = controlMode;
 	this.moveCompleteTime = .01;
-	this.algorithm = algorithms.hamiltonian;
+	this.algorithm = algorithms.naivePerfect;
 	this.init();
 }
