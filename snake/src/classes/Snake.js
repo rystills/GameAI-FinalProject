@@ -45,9 +45,10 @@ Snake.prototype.checkUpdateDirection = function() {
 Snake.prototype.chooseDirNaivePerfect = function() {
 	//optimization; if we are directly above the food and there is no body part below it, simply move down
 	//this optimization fails; if the snake takes a shortcut, and then runs into a constant stream of food, it has no way of recovering
-	/*if (foodPos.x == this.gridX && this.gridY < foodPos.y && (foodPos.y == gridSize - 1 || getAdjacentSpace(this.spaces,directions.down,foodPos.x,foodPos.y).type == "free")) {
+	if ((this.takingShortCut) || foodPos.x == this.gridX && this.gridY < foodPos.y && this.gridX != gridSize-1 && (foodPos.y == gridSize - 1 || getAdjacentSpace(this.spaces,directions.down,foodPos.x,foodPos.y).type == "free") && (this.gridY == 0)) {
+		this.takingShortCut = true;
 		return directions.down;
-	}*/
+	}
 	//in the bottom right corner, we move up
 	if (this.gridY == gridSize-1 && this.gridX == gridSize-1) {
 		return directions.up;
@@ -97,6 +98,9 @@ Snake.prototype.chooseDirNaive = function() {
  */
 Snake.prototype.chooseDirMaxPath = function() {
 	let minPath = calculatePath(this.spaces,{"x":this.gridX,"y":this.gridY},foodPos,compareCoords,getAdjacentSpaces,spaceIsFree,true);
+	//todo:
+	//for each space in the path:
+		//try to extend in either other direction (ie. for a right space, try to extend up or down)
 	
 }
 
@@ -200,6 +204,7 @@ Snake.prototype.checkEat = function() {
 	if (this.gridX == foodPos.x && this.gridY == foodPos.y) {
 		++score;
 		++this.size;
+		this.takingShortCut = false;
 		placeFood();
 		return true;
 	}
@@ -272,6 +277,9 @@ Snake.prototype.init = function() {
 	this.head = {"x":this.gridX,"y":this.gridY};
 	this.neck = {"x":this.gridX-1,"y":this.gridY};
 	this.tail = {"x":this.gridX-this.size+1,"y":this.gridY};
+	
+	//optimization bool
+	this.takingShortCut = false;
 }
 
 

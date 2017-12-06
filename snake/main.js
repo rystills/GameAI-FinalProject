@@ -347,7 +347,7 @@ function initGlobals() {
 	
 	//global game constants
 	gridScale = 24;
-	gridSize = 30;
+	gridSize = 18;
 	
 	//global game objects
 	objects = [];
