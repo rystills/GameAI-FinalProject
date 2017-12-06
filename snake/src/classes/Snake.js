@@ -1,7 +1,7 @@
 directions = new Enum("up","left", "down", "right");
 controlModes = new Enum("human","AI");
 directionChanges = new Enum({"x":0,"y":-1},{"x":-1,"y":0},{"x":0,"y":1},{"x":1,"y":0});
-algorithms = new Enum("naive","hamiltonian", "naivePerfect");
+algorithms = new Enum("naive","hamiltonian", "naivePerfect", "maxPath");
 
 Snake.prototype.visitedQueue = []
 
@@ -43,6 +43,11 @@ Snake.prototype.checkUpdateDirection = function() {
  * choose the next direction in which to face using a naive perfect algorithm
  */
 Snake.prototype.chooseDirNaivePerfect = function() {
+	//optimization; if we are directly above the food and there is no body part below it, simply move down
+	//this optimization fails; if the snake takes a shortcut, and then runs into a constant stream of food, it has no way of recovering
+	/*if (foodPos.x == this.gridX && this.gridY < foodPos.y && (foodPos.y == gridSize - 1 || getAdjacentSpace(this.spaces,directions.down,foodPos.x,foodPos.y).type == "free")) {
+		return directions.down;
+	}*/
 	//in the bottom right corner, we move up
 	if (this.gridY == gridSize-1 && this.gridX == gridSize-1) {
 		return directions.up;
@@ -70,6 +75,9 @@ Snake.prototype.chooseDirNaivePerfect = function() {
 		}
 		return directions.right;
 	}
+	
+	//if we hit none of those cases, we must have won
+	return this.direction;
 }
 
 /**
@@ -82,6 +90,14 @@ Snake.prototype.chooseDirNaive = function() {
 		return getAdjacentDir({"x":this.gridX,"y":this.gridY}, foodPath[1]);	
 	}
 	return this.dir;	
+}
+
+/**
+ * choose the next direction by finding the maximum path to the food
+ */
+Snake.prototype.chooseDirMaxPath = function() {
+	let minPath = calculatePath(this.spaces,{"x":this.gridX,"y":this.gridY},foodPos,compareCoords,getAdjacentSpaces,spaceIsFree,true);
+	
 }
 
 /**
@@ -145,6 +161,9 @@ Snake.prototype.AIChooseDir = function() {
 		
 		case algorithms.naivePerfect:
 			return this.chooseDirNaivePerfect();
+			
+		case algorithms.maxPath:
+			return this.chooseDirMaxPath();
 	}
 }
 

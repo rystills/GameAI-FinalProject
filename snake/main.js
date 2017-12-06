@@ -195,8 +195,8 @@ function changeControlMode() {
  * toggle the snake AI algorithm
  */
 function changeSnakeAlgorithm() {
-	player.algorithm = (player.algorithm == algorithms.naive ? algorithms.hamiltonian : (player.algorithm == algorithms.hamiltonian ? algorithms.naivePerfect : algorithms.naive));
-	this.text = "AI Algorithm: " + (player.algorithm == algorithms.naive ? "Naive" : (player.algorithm == algorithms.hamiltonian ? "Hamiltonian" : "naivePerfect"));
+	player.algorithm = (player.algorithm+1)%algorithms.length;
+	this.text = "AI Algorithm: " + algorithms[player.algorithm];
 }
 
 /**
