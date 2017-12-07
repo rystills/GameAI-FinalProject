@@ -86,6 +86,13 @@ function drawPlayer() {
 	}
 	ctx.closePath();
 	ctx.fill();
+	
+	//draw the head as a separate color
+	ctx.fillStyle = "#8888DD";
+	ctx.beginPath();
+	ctx.rect(player.head.x*gridScale,player.head.y*gridScale,gridScale,gridScale);
+	ctx.closePath();
+	ctx.fill();
 }
 
 /**
@@ -352,7 +359,7 @@ function initGlobals() {
 	totalTime = 0;
 	
 	//global game constants
-	gridScale = 24;
+	gridScale = 60;
 	gridSize = 14;
 	
 	//global game objects
