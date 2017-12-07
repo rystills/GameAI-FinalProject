@@ -73,19 +73,20 @@ Snake.prototype.chooseDirNaivePerfect = function() {
 	if ((this.optimizationState == -1) || foodPos.x == this.gridX && this.gridY < foodPos.y && this.gridX != gridSize-1 && (foodPos.y == gridSize - 1 || getAdjacentSpace(this.spaces,directions.down,foodPos.x,foodPos.y).type == "free") && (this.gridY == 0)) {
 		this.optimizationState = -1;
 		//move down until we reach our body
-		/*//if there is not a body part two spaces below us, move down
+		//if there is not a body part two spaces below us (and the food x is <= our x) move down
 		try {
-			if (getAdjacentSpace(this.spaces,directions.down,this.gridX,this.gridY+1).type != "blocked") {
+			if (getAdjacentSpace(this.spaces,directions.down,this.gridX,this.gridY+1).type != "blocked" && foodPos.x <= this.gridX) {
 				return directions.down;	
 			}
 		}
-		catch (err) {}*/
+		catch (err) {}
+		this.optimizationState = 0;
 		//move down only until we reach the food
-		if (getAdjacentSpace(this.spaces,directions.down,this.gridX,this.gridY).type == "food") {
+		/*if (getAdjacentSpace(this.spaces,directions.down,this.gridX,this.gridY).type == "food") {
 			console.log("wew");
 			this.optimizationState = 0;
 		}
-		return directions.down;
+		return directions.down;*/
 	}
 	//in the bottom right corner, we move up
 	if (this.gridY == gridSize-1 && this.gridX == gridSize-1) {
