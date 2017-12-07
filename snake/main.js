@@ -136,6 +136,7 @@ function drawHUD() {
 	uictx.font = "24px Arial";
 	uictx.fillStyle = "#FFFFFF";
 	uictx.fillText("Score: " + score, 10,30);
+	uictx.fillText("Steps: " + steps, 10,70);
 }
 
 /**
@@ -171,6 +172,7 @@ function update() {
  */
 function restartGame() {
 	score = 0;
+	steps = 0;
 	player.init();
 	placeFood();
 	gameActive = true;
@@ -203,7 +205,7 @@ function changeSnakeAlgorithm() {
  * toggle the snake speed between .1, .01, and .001
  */
 function changeSnakeSpeed() {
-	player.moveCompleteTime = (player.moveCompleteTime == .1 ? .01 : (player.moveCompleteTime == .01 ? .005 : (player.moveCompleteTime == .005 ? .001 :.1)));
+	player.moveCompleteTime = (player.moveCompleteTime == .1 ? .05 : (player.moveCompleteTime == .05 ? .01 : (player.moveCompleteTime == .01 ? .005 : (player.moveCompleteTime == .005 ? .001 :.1))));
 	this.text = "Snake Speed: " + 1/player.moveCompleteTime;
 }
 
@@ -358,14 +360,15 @@ function initGlobals() {
 	
 	//global list of UI buttons
 	buttons = [];
-	buttons.push(new Button(10,50,uicnv,"Restart Game",24,restartGame));
-	buttons.push(new Button(10,100,uicnv,"Game Mode: Human",24,changeControlMode));
-	buttons.push(new Button(10,150,uicnv,"AI Algorithm: naivePerfect",24,changeSnakeAlgorithm));
-	buttons.push(new Button(10,200,uicnv,"Snake Speed: 1000",24,changeSnakeSpeed));
+	buttons.push(new Button(10,90,uicnv,"Restart Game",24,restartGame));
+	buttons.push(new Button(10,140,uicnv,"Game Mode: Human",24,changeControlMode));
+	buttons.push(new Button(10,190,uicnv,"AI Algorithm: naivePerfect",24,changeSnakeAlgorithm));
+	buttons.push(new Button(10,240,uicnv,"Snake Speed: 1000",24,changeSnakeSpeed));
 	
 	//global counters
 	score = 0;
-		
+	steps = 0;
+	
 	//create the player character
 	player = new Snake(controlModes.human);
 	objects.push(player);
