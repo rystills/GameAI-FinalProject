@@ -220,6 +220,10 @@ function placeFood() {
 			}
 		}
 	}
+	//if there's nowhere left to put the food, the game is over
+	if (validSpaces.length == 0) {
+		return endGame();
+	}
 	foodPos = validSpaces[getRandomInt(0,validSpaces.length)];
 }
 
