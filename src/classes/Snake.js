@@ -50,7 +50,7 @@ Snake.prototype.chooseDirNaivePerfect = function() {
 	//after optimization, path to just shy of topright corner, then path to just shy of topleft corner, to reset the body
 	if (this.size == gridSize) {
 		if (this.optimizationState == 0) {
-			let cornerPath = calculatePath(this.spaces,{"x":this.gridX,"y":this.gridY},{"x":gridSize-2,"y":1},compareCoords,getAdjacentSpaces,spaceIsFree,true);
+			let cornerPath = calculatePath(this.spaces,{"x":this.gridX,"y":this.gridY},{"x":gridSize-2,"y":2},compareCoords,getAdjacentSpaces,spaceIsFree,true);
 			if (cornerPath.length > 1) {
 				return getAdjacentDir({"x":this.gridX,"y":this.gridY}, cornerPath[1]);
 			}
@@ -58,7 +58,7 @@ Snake.prototype.chooseDirNaivePerfect = function() {
 			return this.chooseDirNaivePerfect();
 		}
 		if (this.optimizationState == 1) {
-			let cornerPath = calculatePath(this.spaces,{"x":this.gridX,"y":this.gridY},{"x":1,"y":1},compareCoords,getAdjacentSpaces,spaceIsFree,true);
+			let cornerPath = calculatePath(this.spaces,{"x":this.gridX,"y":this.gridY},{"x":1,"y":2},compareCoords,getAdjacentSpaces,spaceIsFree,true);
 			if (cornerPath.length > 1) {
 				return getAdjacentDir({"x":this.gridX,"y":this.gridY}, cornerPath[1]);
 			}
