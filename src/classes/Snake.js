@@ -69,17 +69,23 @@ Snake.prototype.chooseDirNaivePerfect = function() {
 	}
 	
 	//optimization; if we are directly above the food and there is no body part below it, simply move down
-	//this optimization fails; if the snake takes a shortcut, and then runs into a constant stream of food, it has no way of recovering
 	if ((this.optimizationState == -1) || foodPos.x == this.gridX && this.gridY < foodPos.y && this.gridX != gridSize-1 && (foodPos.y == gridSize - 1 || getAdjacentSpace(this.spaces,directions.down,foodPos.x,foodPos.y).type == "free") && (this.gridY == 0)) {
 		this.optimizationState = -1;
 		//move down until we reach our body
-		//if there is not a body part two spaces below us (and the food x is <= our x) move down
+		//if there is not a body part two spaces below us move down
 		try {
-			if (getAdjacentSpace(this.spaces,directions.down,this.gridX,this.gridY+1).type != "blocked" && foodPos.x <= this.gridX) {
-				return directions.down;	
+			if (getAdjacentSpace(this.spaces,directions.down,this.gridX,this.gridY+1).type != "blocked") {
+				if (foodPos.x == this.gridX) {
+					return directions.down;	
+				}
+				if (foodPos.x <= this.gridX && foodPos.y < this.gridY) {
+					return directions.down;
+				}
 			}
+			
 		}
 		catch (err) {}
+		
 		this.optimizationState = 0;
 		//move down only until we reach the food
 		/*if (getAdjacentSpace(this.spaces,directions.down,this.gridX,this.gridY).type == "food") {
@@ -299,6 +305,7 @@ Snake.prototype.moveForwards = function() {
 	if (this.controlMode == controlModes.AI) {
 		this.dir = this.AIChooseDir();
 	}
+	++steps;
 }
 
 /**
