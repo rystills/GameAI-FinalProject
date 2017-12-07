@@ -70,8 +70,21 @@ Snake.prototype.chooseDirNaivePerfect = function() {
 	
 	//optimization; if we are directly above the food and there is no body part below it, simply move down
 	//this optimization fails; if the snake takes a shortcut, and then runs into a constant stream of food, it has no way of recovering
-	if ((this.optimizationState == 1) || foodPos.x == this.gridX && this.gridY < foodPos.y && this.gridX != gridSize-1 && (foodPos.y == gridSize - 1 || getAdjacentSpace(this.spaces,directions.down,foodPos.x,foodPos.y).type == "free") && (this.gridY == 0)) {
-		this.optimizationState = 1;
+	if ((this.optimizationState == -1) || foodPos.x == this.gridX && this.gridY < foodPos.y && this.gridX != gridSize-1 && (foodPos.y == gridSize - 1 || getAdjacentSpace(this.spaces,directions.down,foodPos.x,foodPos.y).type == "free") && (this.gridY == 0)) {
+		this.optimizationState = -1;
+		//move down until we reach our body
+		/*//if there is not a body part two spaces below us, move down
+		try {
+			if (getAdjacentSpace(this.spaces,directions.down,this.gridX,this.gridY+1).type != "blocked") {
+				return directions.down;	
+			}
+		}
+		catch (err) {}*/
+		//move down only until we reach the food
+		if (getAdjacentSpace(this.spaces,directions.down,this.gridX,this.gridY).type == "food") {
+			console.log("wew");
+			this.optimizationState = 0;
+		}
 		return directions.down;
 	}
 	//in the bottom right corner, we move up
@@ -238,7 +251,6 @@ Snake.prototype.checkEat = function() {
 	if (this.gridX == foodPos.x && this.gridY == foodPos.y) {
 		++score;
 		++this.size;
-		this.optimizationState = 0;
 		placeFood();
 		return true;
 	}
